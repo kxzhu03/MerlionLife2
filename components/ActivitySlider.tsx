@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface ActivitySliderProps {
   label: string;
@@ -19,6 +18,11 @@ const ActivitySlider: React.FC<ActivitySliderProps> = ({
   icon,
   color,
 }) => {
+  const canDecrement = value > 0;
+  const canIncrement = value < maxValue;
+
+  const progressPercent = maxValue > 0 ? (value / maxValue) * 100 : 0;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -26,17 +30,28 @@ const ActivitySlider: React.FC<ActivitySliderProps> = ({
         <Text style={styles.label}>{label}</Text>
         <Text style={styles.value}>{value} pts</Text>
       </View>
-      <Slider
-        value={value}
-        onValueChange={onChange}
-        minimumValue={0}
-        maximumValue={maxValue}
-        step={1}
-        minimumTrackTintColor={color}
-        maximumTrackTintColor="#E0E0E0"
-        thumbTintColor={color}
-        style={styles.slider}
-      />
+
+      <View style={styles.stepperRow}>
+        <TouchableOpacity
+          onPress={() => onChange(Math.max(0, value - 1))}
+          disabled={!canDecrement}
+          style={[styles.stepperBtn, { backgroundColor: canDecrement ? color : '#ECF0F1' }]}
+        >
+          <Text style={styles.stepperText}>-</Text>
+        </TouchableOpacity>
+
+        <View style={styles.track}>
+          <View style={[styles.progress, { width: `${progressPercent}%`, backgroundColor: color }]} />
+        </View>
+
+        <TouchableOpacity
+          onPress={() => onChange(Math.min(maxValue, value + 1))}
+          disabled={!canIncrement}
+          style={[styles.stepperBtn, { backgroundColor: canIncrement ? color : '#ECF0F1' }]}
+        >
+          <Text style={styles.stepperText}>+</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -76,6 +91,34 @@ const styles = StyleSheet.create({
   },
   slider: {
     height: 40,
+  },
+  stepperRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  stepperBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  track: {
+    flex: 1,
+    height: 10,
+    marginHorizontal: 12,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  progress: {
+    height: '100%',
   },
 });
 
