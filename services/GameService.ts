@@ -62,8 +62,8 @@ export class GameService {
     const statsChange: Partial<PlayerStats> = {};
     let wealthChange = 0;
 
-    // Academic points effect
-    statsChange.academicSkill = activityPoints.academics * 5;
+    // Academic points effect (1:1)
+    statsChange.academicSkill = activityPoints.academics;
     if (activityPoints.academics > 7) {
       statsChange.health = -(activityPoints.academics - 7) * 2;
     }
@@ -77,8 +77,8 @@ export class GameService {
       }
     }
 
-    // Volunteering points effect
-    statsChange.socialImpact = activityPoints.volunteering * 2;
+    // Volunteering points effect (1:1)
+    statsChange.socialImpact = activityPoints.volunteering;
 
     // Meal choice effects
     if (mealChoice === MealChoice.HEALTHY) {
@@ -92,7 +92,7 @@ export class GameService {
     // Tuition effects (per year, not per day)
     const tuitionCount = player.tuitionSubjects.length;
     if (tuitionCount > 0) {
-      statsChange.academicSkill = (statsChange.academicSkill || 0) + tuitionCount * 5;
+      statsChange.academicSkill = (statsChange.academicSkill || 0) + tuitionCount; // 1 per subject
       statsChange.happiness = (statsChange.happiness || 0) - tuitionCount;
     }
 
@@ -172,7 +172,7 @@ export class GameService {
   static updateCCASkill(player: Player, ccaPoints: number): Player {
     if (!player.cca) return player;
 
-    const newCCASkill = Math.min(100, player.ccaSkill + ccaPoints * 5);
+    const newCCASkill = Math.min(100, player.ccaSkill + ccaPoints);
     return {
       ...player,
       ccaSkill: newCCASkill

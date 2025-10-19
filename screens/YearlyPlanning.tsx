@@ -18,7 +18,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   const [academics, setAcademics] = useState(0);
   const [cca, setCca] = useState(0);
   const [volunteering, setVolunteering] = useState(0);
-  const [mealHealthy, setMealHealthy] = useState(true);
+  const canAffordHealthyInit = route.params.gameState.player.dailyAllowance >= HEALTHY_MEAL_COST;
+  const [mealHealthy, setMealHealthy] = useState<boolean>(canAffordHealthyInit);
   const [tuitionSelected, setTuitionSelected] = useState<string[]>([]);
   const [selectedCCA, setSelectedCCA] = useState<string | null>(gameState.player.cca || null);
 
