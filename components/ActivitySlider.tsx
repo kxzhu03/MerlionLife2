@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Slider from 'react-native-slider';
+import Slider from '@react-native-community/slider';
 
 interface ActivitySliderProps {
   label: string;
