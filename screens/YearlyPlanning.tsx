@@ -48,30 +48,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     const updated = GameService.updatePlayerStats(player, { ...statsChange, wealth: wealthChange });
     const updatedWithCCA = GameService.updateCCASkill(updated, cca);
 
-    // Random event (10% chance overall)
-    const event = GameService.applyRandomEvent();
+    // Random events are handled at the start of the next year (on Game screen)
     let finalPlayer = updatedWithCCA;
-    let eventApplied: RandomEvent[] = [];
-    if (event) {
-      const changes = GameService.getRandomEventEffects(event);
-      finalPlayer = GameService.updatePlayerStats(finalPlayer, changes);
-      eventApplied = [event];
-      Alert.alert('Random Event', `${event.replace(/_/g, ' ')}`);
-      if (event === RandomEvent.PARENTS_DIVORCE) {
-        // Downgrade SES by one tier if possible
-        const order: SESClass[] = [SESClass.UPPER, SESClass.MIDDLE, SESClass.LOWER];
-        const idx = order.indexOf(finalPlayer.sesClass);
-        const newIdx = Math.min(idx + 1, order.length - 1);
-        const newSES = order[newIdx];
-        if (newSES !== finalPlayer.sesClass) {
-          finalPlayer = {
-            ...finalPlayer,
-            sesClass: newSES,
-            parentsOccupation: SES_CONFIG[newSES].parentsOccupation
-          };
-        }
-      }
-    }
 
     // Advance year
     const advanced = GameService.advanceToNextYear(finalPlayer);

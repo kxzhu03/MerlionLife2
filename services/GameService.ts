@@ -96,18 +96,18 @@ export class GameService {
       statsChange.happiness = (statsChange.happiness || 0) - tuitionCount;
     }
 
-    // Daily allowance calculation
-    const dailyNetChange = player.dailyAllowance + wealthChange;
-    wealthChange = dailyNetChange * 365;
-    // Apply tuition yearly wealth cost after daily accumulation
-    wealthChange -= tuitionCount; // -1 wealth per subject per year
+    // Yearly wealth: subtract meal cost per day only
+    const dailyMealCost = mealChoice === MealChoice.HEALTHY ? HEALTHY_MEAL_COST : UNHEALTHY_MEAL_COST;
+    wealthChange = -(dailyMealCost * 365);
+    // Apply tuition yearly wealth cost (simple model): -1 per subject per year
+    wealthChange -= tuitionCount;
 
     return { statsChange, wealthChange };
   }
 
   static applyRandomEvent(): RandomEvent | null {
-    // 10% chance that any random event happens this year
-    const trigger = Math.random() < 0.1;
+    // 30% chance that any random event happens this year
+    const trigger = Math.random() < 0.3;
     if (!trigger) return null;
     const index = Math.floor(Math.random() * RANDOM_EVENTS.length);
     return RANDOM_EVENTS[index].id;

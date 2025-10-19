@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import { GameState, Player, RandomEvent } from '../types';
+import { GameState, Player, RandomEvent, SESClass } from '../types';
 import PlayerCard from '../components/PlayerCard';
 import { GameService } from '../services/GameService';
+import { RANDOM_EVENTS, SES_CONFIG } from '../data/constants';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'Game'>;
 type RouteProps = RouteProp<RootStackParamList, 'Game'>;
@@ -14,12 +15,54 @@ interface Props { navigation: NavProp; route: RouteProps; }
 
 const GameScreen: React.FC<Props> = ({ navigation, route }) => {
   const [gameState, setGameState] = useState<GameState>(route.params?.gameState);
+  const [hasShownEventForYear, setHasShownEventForYear] = useState<boolean>(false);
 
   useEffect(() => {
     if (!gameState) {
       GameService.loadGameState().then((gs) => { if (gs) setGameState(gs); });
     }
   }, [gameState]);
+
+  // Reset event gate when year changes
+  useEffect(() => {
+    if (gameState) {
+      setHasShownEventForYear(false);
+    }
+  }, [gameState?.player.currentYear]);
+
+  // Show random event popup at the start of the year
+  useEffect(() => {
+    if (!gameState || hasShownEventForYear) return;
+    const event = GameService.applyRandomEvent();
+    if (!event) {
+      setHasShownEventForYear(true);
+      return;
+    }
+    const eventData = RANDOM_EVENTS.find(e => e.id === event);
+    let updatedPlayer = GameService.updatePlayerStats(gameState.player, GameService.getRandomEventEffects(event));
+    if (event === RandomEvent.PARENTS_DIVORCE) {
+      const order: SESClass[] = [SESClass.UPPER, SESClass.MIDDLE, SESClass.LOWER];
+      const idx = order.indexOf(updatedPlayer.sesClass);
+      const newIdx = Math.min(idx + 1, order.length - 1);
+      const newSES = order[newIdx];
+      if (newSES !== updatedPlayer.sesClass) {
+        updatedPlayer = {
+          ...updatedPlayer,
+          sesClass: newSES,
+          parentsOccupation: SES_CONFIG[newSES].parentsOccupation
+        };
+      }
+    }
+    const updatedState: GameState = { ...gameState, player: updatedPlayer };
+    setGameState(updatedState);
+    GameService.saveGameState(updatedState);
+    setHasShownEventForYear(true);
+    if (eventData) {
+      Alert.alert(eventData.name, eventData.description);
+    } else {
+      Alert.alert('Random Event', event.replace(/_/g, ' '));
+    }
+  }, [gameState, hasShownEventForYear]);
 
   if (!gameState) return null;
 

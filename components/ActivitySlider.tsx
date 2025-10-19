@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ACTIVITY_POINTS_PER_YEAR } from '../data/constants';
 
 interface ActivitySliderProps {
   label: string;
@@ -21,7 +22,7 @@ const ActivitySlider: React.FC<ActivitySliderProps> = ({
   const canDecrement = value > 0;
   const canIncrement = value < maxValue;
 
-  const progressPercent = maxValue > 0 ? (value / maxValue) * 100 : 0;
+  const progressPercent = ACTIVITY_POINTS_PER_YEAR > 0 ? (value / ACTIVITY_POINTS_PER_YEAR) * 100 : 0;
 
   return (
     <View style={styles.container}>
