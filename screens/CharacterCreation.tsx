@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/navigation';
-import { CCA_OPTIONS, SES_CONFIG } from '../data/constants';
-import { CCAOption, GameState, MealChoice, Player, SESClass } from '../types';
+import { SES_CONFIG } from '../data/constants';
+import { GameState, Player, SESClass } from '../types';
 import { GameService } from '../services/GameService';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'CharacterCreation'>;
@@ -17,25 +17,20 @@ const AVATARS = ['😀','😎','🤓','🥳','🧑‍🦱','🧒','👧','🧑�
 const CharacterCreation: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState(AVATARS[0]);
-  const [sesClass, setSesClass] = useState<SESClass>(() => {
+  const [sesClass] = useState<SESClass>(() => {
     const options = [SESClass.LOWER, SESClass.MIDDLE, SESClass.UPPER];
     return options[Math.floor(Math.random() * options.length)];
   });
-  const [selectedCCA, setSelectedCCA] = useState<CCAOption | null>(null);
 
   const sesData = SES_CONFIG[sesClass];
 
-  const canContinue = name.trim().length > 0 && !!selectedCCA;
-
-  const handleRandomizeSES = () => {
-    const options = [SESClass.LOWER, SESClass.MIDDLE, SESClass.UPPER];
-    setSesClass(options[Math.floor(Math.random() * options.length)]);
-  };
+  const canContinue = name.trim().length > 0;
 
   const handleStart = async () => {
-    if (!canContinue || !selectedCCA) return;
-    const player = GameService.createNewPlayer(name.trim(), avatar, sesClass);
-    const initialized: Player = { ...player, cca: selectedCCA };
+    if (!canContinue) return;
+    const randomizedSES = [SESClass.LOWER, SESClass.MIDDLE, SESClass.UPPER][Math.floor(Math.random() * 3)];
+    const player = GameService.createNewPlayer(name.trim(), avatar, randomizedSES);
+    const initialized: Player = { ...player };
     const gameState: GameState = {
       player: initialized,
       currentYear: 1,
@@ -67,31 +62,7 @@ const CharacterCreation: React.FC<Props> = ({ navigation }) => {
           showsHorizontalScrollIndicator={false}
         />
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.label}>SES Class</Text>
-          <TouchableOpacity onPress={handleRandomizeSES}><Text style={styles.link}>randomize</Text></TouchableOpacity>
-        </View>
-        <View style={styles.sesRow}>
-          {[SESClass.LOWER, SESClass.MIDDLE, SESClass.UPPER].map((c) => (
-            <TouchableOpacity key={c} onPress={() => setSesClass(c)} style={[styles.sesPill, sesClass === c && styles.sesPillActive]}>
-              <Text style={[styles.sesText, sesClass === c && styles.sesTextActive]}>{c.toUpperCase()}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
         <Text style={styles.helper}>{sesData.parentsOccupation}</Text>
-
-        <Text style={styles.label}>Choose CCA</Text>
-        <View>
-          {CCA_OPTIONS.map((cca) => (
-            <TouchableOpacity key={cca.id} style={[styles.ccaItem, selectedCCA === cca.id && styles.ccaItemActive]} onPress={() => setSelectedCCA(cca.id)}>
-              <Text style={styles.ccaEmoji}>{cca.emoji}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.ccaName}>{cca.name}</Text>
-                <Text style={styles.ccaDesc}>{cca.description}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
 
         <TouchableOpacity disabled={!canContinue} onPress={handleStart} style={[styles.startBtn, !canContinue && styles.startBtnDisabled]}>
           <Text style={styles.startText}>Start Primary 1</Text>
