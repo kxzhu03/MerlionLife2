@@ -35,6 +35,8 @@ export class GameService {
     const sesData = SES_CONFIG[sesClass];
     const dailyAllowance = this.getRandomAllowance(sesData.dailyAllowanceRange);
     
+    const occupations = SES_CONFIG[sesClass].parentsOccupations;
+    const pickedOccupation = occupations[Math.floor(Math.random() * occupations.length)];
     return {
       id: Date.now().toString(),
       name,
@@ -45,7 +47,7 @@ export class GameService {
       stats: { ...sesData.startingStats },
       cca: null,
       ccaSkill: 0,
-      parentsOccupation: sesData.parentsOccupation,
+      parentsOccupation: pickedOccupation,
       dailyAllowance,
       mealChoice: MealChoice.HEALTHY,
       tuitionSubjects: [],
@@ -96,11 +98,9 @@ export class GameService {
       statsChange.happiness = (statsChange.happiness || 0) - tuitionCount;
     }
 
-    // Yearly wealth: subtract meal cost per day only
+    // Yearly wealth: (allowance - mealCost) * 365, minus tuition
     const dailyMealCost = mealChoice === MealChoice.HEALTHY ? HEALTHY_MEAL_COST : UNHEALTHY_MEAL_COST;
-    wealthChange = -(dailyMealCost * 365);
-    // Apply tuition yearly wealth cost (simple model): -1 per subject per year
-    wealthChange -= tuitionCount;
+    wealthChange = (player.dailyAllowance - dailyMealCost) * 365;
 
     return { statsChange, wealthChange };
   }

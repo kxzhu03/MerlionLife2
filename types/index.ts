@@ -36,7 +36,17 @@ export enum RandomEvent {
   PARENTS_DIVORCE = 'parents_divorce',
   BEST_FRIEND = 'best_friend',
   ERASER_BUSINESS = 'eraser_business',
-  MINOR_FLU = 'minor_flu'
+  MINOR_FLU = 'minor_flu',
+  SCHOLARSHIP = 'scholarship',
+  LOST_POCKET_MONEY = 'lost_pocket_money',
+  WON_ART_CONTEST = 'won_art_contest',
+  SPORT_INJURY = 'sport_injury',
+  COMMUNITY_AWARD = 'community_award',
+  NEW_SIBLING = 'new_sibling',
+  MOVED_HOUSE = 'moved_house',
+  SCHOOL_MERGER = 'school_merger',
+  MENTOR_SUPPORT = 'mentor_support',
+  LIBRARY_DISCOVERY = 'library_discovery'
 }
 
 export interface PlayerStats {
@@ -86,7 +96,7 @@ export interface SESData {
   startingStats: PlayerStats;
   dailyAllowanceRange: [number, number];
   maxTuitionSubjects: number;
-  parentsOccupation: string;
+  parentsOccupations: string[];
 }
 
 export interface CCAOptionData {

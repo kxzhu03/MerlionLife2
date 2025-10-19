@@ -12,7 +12,13 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
     },
     dailyAllowanceRange: [2, 2],
     maxTuitionSubjects: 0,
-    parentsOccupation: 'Taxi Driver & Hawker'
+    parentsOccupations: [
+      'Taxi Driver & Hawker',
+      'Cleaner & Cashier',
+      'Delivery Rider & Retail Assistant',
+      'Security Guard & Janitor',
+      'Construction Worker & Stall Assistant'
+    ]
   },
   [SESClass.MIDDLE]: {
     class: SESClass.MIDDLE,
@@ -25,7 +31,13 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
     },
     dailyAllowanceRange: [3, 5],
     maxTuitionSubjects: 1,
-    parentsOccupation: 'Executive & Teacher'
+    parentsOccupations: [
+      'Executive & Teacher',
+      'Nurse & Technician',
+      'Police Officer & Admin Assistant',
+      'Engineer & Accountant',
+      'Sales Manager & Civil Servant'
+    ]
   },
   [SESClass.UPPER]: {
     class: SESClass.UPPER,
@@ -38,7 +50,13 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
     },
     dailyAllowanceRange: [10, 20],
     maxTuitionSubjects: 2,
-    parentsOccupation: 'Doctor & Lawyer'
+    parentsOccupations: [
+      'Doctor & Lawyer',
+      'Business Owner & Consultant',
+      'Professor & Architect',
+      'Investor & Corporate Director',
+      'Surgeon & Judge'
+    ]
   }
 };
 
@@ -91,7 +109,17 @@ export const RANDOM_EVENTS: RandomEventData[] = [
     description: 'You caught a minor flu this year',
     statChanges: { health: -3 },
     probability: 0.2
-  }
+  },
+  { id: RandomEvent.SCHOLARSHIP, name: 'Mini Scholarship', description: 'You received a small bursary for good effort', statChanges: { wealth: 50, academicSkill: 1 }, probability: 0.1 },
+  { id: RandomEvent.LOST_POCKET_MONEY, name: 'Lost Pocket Money', description: 'Your wallet went missing one day', statChanges: { wealth: -10, happiness: -2 }, probability: 0.1 },
+  { id: RandomEvent.WON_ART_CONTEST, name: 'Won Art Contest', description: 'Your drawing won a school competition', statChanges: { happiness: 6, socialImpact: 2 }, probability: 0.08 },
+  { id: RandomEvent.SPORT_INJURY, name: 'Sports Injury', description: 'You sprained your ankle during PE', statChanges: { health: -6, happiness: -2 }, probability: 0.08 },
+  { id: RandomEvent.COMMUNITY_AWARD, name: 'Community Award', description: 'Recognised for volunteering spirit', statChanges: { socialImpact: 6, happiness: 3 }, probability: 0.07 },
+  { id: RandomEvent.NEW_SIBLING, name: 'New Sibling', description: 'A baby joined your family', statChanges: { happiness: 4 }, probability: 0.07 },
+  { id: RandomEvent.MOVED_HOUSE, name: 'Moved House', description: 'Your family moved to a new flat', statChanges: { happiness: -2, socialImpact: -1 }, probability: 0.06 },
+  { id: RandomEvent.SCHOOL_MERGER, name: 'School Merger', description: 'Your school merged and routines changed', statChanges: { happiness: -1 }, probability: 0.05 },
+  { id: RandomEvent.MENTOR_SUPPORT, name: 'Mentor Support', description: 'A caring teacher tutored you after class', statChanges: { academicSkill: 2, happiness: 2 }, probability: 0.09 },
+  { id: RandomEvent.LIBRARY_DISCOVERY, name: 'Library Discovery', description: 'You fell in love with reading new books', statChanges: { academicSkill: 2, happiness: 1 }, probability: 0.12 }
 ];
 
 export const PSLE_STREAM_THRESHOLDS = {

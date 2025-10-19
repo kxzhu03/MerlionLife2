@@ -21,13 +21,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
       </View>
       
       <View style={styles.stats}>
-        <StatBar
-          label="Wealth"
-          value={player.stats.wealth}
-          maxValue={1000}
-          color="#4CAF50"
-          icon="💰"
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+          <Text style={{ fontSize: 14 }}>💰</Text>
+          <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '700', color: '#4CAF50' }}>S${player.stats.wealth}</Text>
+        </View>
         <StatBar
           label="Happiness"
           value={player.stats.happiness}

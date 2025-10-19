@@ -41,17 +41,19 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
       return;
     }
     const eventData = RANDOM_EVENTS.find(e => e.id === event);
-    let updatedPlayer = GameService.updatePlayerStats(gameState.player, GameService.getRandomEventEffects(event));
+    const changes = GameService.getRandomEventEffects(event);
+    let updatedPlayer = GameService.updatePlayerStats(gameState.player, changes);
     if (event === RandomEvent.PARENTS_DIVORCE) {
       const order: SESClass[] = [SESClass.UPPER, SESClass.MIDDLE, SESClass.LOWER];
       const idx = order.indexOf(updatedPlayer.sesClass);
       const newIdx = Math.min(idx + 1, order.length - 1);
       const newSES = order[newIdx];
       if (newSES !== updatedPlayer.sesClass) {
+        const occs = SES_CONFIG[newSES].parentsOccupations;
         updatedPlayer = {
           ...updatedPlayer,
           sesClass: newSES,
-          parentsOccupation: SES_CONFIG[newSES].parentsOccupation
+          parentsOccupation: occs[Math.floor(Math.random() * occs.length)]
         };
       }
     }
@@ -59,11 +61,16 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
     setGameState(updatedState);
     GameService.saveGameState(updatedState);
     setHasShownEventForYear(true);
-    if (eventData) {
-      Alert.alert(eventData.name, eventData.description);
-    } else {
-      Alert.alert('Random Event', event.replace(/_/g, ' '));
-    }
+    const parts: string[] = [];
+    if (typeof changes.wealth === 'number' && changes.wealth !== 0) parts.push(`${changes.wealth > 0 ? '+' : ''}S$${changes.wealth} wealth`);
+    if (typeof changes.happiness === 'number' && changes.happiness !== 0) parts.push(`${changes.happiness > 0 ? '+' : ''}${changes.happiness} happiness`);
+    if (typeof changes.health === 'number' && changes.health !== 0) parts.push(`${changes.health > 0 ? '+' : ''}${changes.health} health`);
+    if (typeof changes.socialImpact === 'number' && changes.socialImpact !== 0) parts.push(`${changes.socialImpact > 0 ? '+' : ''}${changes.socialImpact} social`);
+    if (typeof changes.academicSkill === 'number' && changes.academicSkill !== 0) parts.push(`${changes.academicSkill > 0 ? '+' : ''}${changes.academicSkill} academic`);
+    const deltaText = parts.length ? `Changes: ${parts.join(', ')}` : 'Changes: none';
+    const title = eventData ? eventData.name : 'Random Event';
+    const desc = eventData ? eventData.description : event.replace(/_/g, ' ');
+    Alert.alert(title, `${desc}\n\n${deltaText}`);
   }, [gameState, hasShownEventForYear]);
 
   if (!gameState) return null;
