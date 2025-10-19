@@ -29,7 +29,13 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
 
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={true}
+      overScrollMode="always"
+    >
       <Text style={styles.header}>🎒 Primary School — Year {gameState.player.currentYear}</Text>
       <PlayerCard player={gameState.player} />
       <View style={styles.actions}>
@@ -42,8 +48,8 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16 },
-  scrollContent: { paddingBottom: 40 },
+  container: { flex: 1, backgroundColor: '#F5F7FA' },
+  scrollContent: { padding: 16, paddingBottom: 40 },
   header: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginVertical: 8, textAlign: 'center' },
   actions: { marginTop: 16 },
   primary: { backgroundColor: '#4A90E2', paddingVertical: 14, borderRadius: 12 },

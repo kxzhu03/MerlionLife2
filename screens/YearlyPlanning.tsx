@@ -102,7 +102,13 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={true}
+      overScrollMode="always"
+    >
       <Text style={styles.title}>Plan Year {gameState.player.currentYear}</Text>
       <Text style={styles.subtitle}>Distribute 10 activity points</Text>
       <ActivitySlider label="Academics" value={academics} maxValue={ACTIVITY_POINTS_PER_YEAR - (cca + volunteering)} onChange={setAcademics} icon="📚" color="#2196F3" />
@@ -157,8 +163,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16 },
-  scrollContent: { paddingBottom: 40 },
+  container: { flex: 1, backgroundColor: '#F5F7FA' },
+  scrollContent: { padding: 16, paddingBottom: 40 },
   title: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginBottom: 4, textAlign: 'center' },
   subtitle: { fontSize: 12, color: '#7F8C8D', textAlign: 'center', marginBottom: 12 },
   remaining: { textAlign: 'center', marginBottom: 8, color: '#7F8C8D', fontWeight: '700' },
