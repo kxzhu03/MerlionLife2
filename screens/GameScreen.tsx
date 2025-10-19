@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
@@ -29,7 +29,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
 
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <Text style={styles.header}>🎒 Primary School — Year {gameState.player.currentYear}</Text>
       <PlayerCard player={gameState.player} />
       <View style={styles.actions}>
@@ -37,12 +37,13 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
           <Text style={styles.primaryText}>Plan This Year</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16 },
+  scrollContent: { paddingBottom: 40 },
   header: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginVertical: 8, textAlign: 'center' },
   actions: { marginTop: 16 },
   primary: { backgroundColor: '#4A90E2', paddingVertical: 14, borderRadius: 12 },

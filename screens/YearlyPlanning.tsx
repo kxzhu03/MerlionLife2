@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Alert, ScrollView } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
@@ -27,8 +27,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const maxTuition = SES_CONFIG[gameState.player.sesClass].maxTuitionSubjects;
 
-  const isPrimaryOne = gameState.player.currentYear === 1;
-  const canConfirm = remaining === 0 && (!isPrimaryOne || !!selectedCCA);
+  const canConfirm = remaining === 0 && (!!selectedCCA);
 
   const toggleTuition = (subject: string) => {
     if (tuitionSelected.includes(subject)) {
@@ -56,6 +55,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       const changes = GameService.getRandomEventEffects(event);
       finalPlayer = GameService.updatePlayerStats(finalPlayer, changes);
       eventApplied = [event];
+      Alert.alert('Random Event', `${event.replace(/_/g, ' ')}`);
       if (event === RandomEvent.PARENTS_DIVORCE) {
         // Downgrade SES by one tier if possible
         const order: SESClass[] = [SESClass.UPPER, SESClass.MIDDLE, SESClass.LOWER];
@@ -102,7 +102,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <Text style={styles.title}>Plan Year {gameState.player.currentYear}</Text>
       <Text style={styles.subtitle}>Distribute 10 activity points</Text>
       <ActivitySlider label="Academics" value={academics} maxValue={ACTIVITY_POINTS_PER_YEAR - (cca + volunteering)} onChange={setAcademics} icon="📚" color="#2196F3" />
@@ -110,23 +110,21 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       <ActivitySlider label="Volunteering" value={volunteering} maxValue={ACTIVITY_POINTS_PER_YEAR - (academics + cca)} onChange={setVolunteering} icon="🤝" color="#9C27B0" />
       <Text style={styles.remaining}>Remaining: {remaining} pts</Text>
 
-      {isPrimaryOne && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Choose a CCA</Text>
-          <View>
-            {CCA_OPTIONS.map((opt) => (
-              <TouchableOpacity key={opt.id} style={[styles.ccaItem, selectedCCA === opt.id && styles.ccaItemActive]} onPress={() => setSelectedCCA(opt.id)}>
-                <Text style={styles.ccaEmoji}>{opt.emoji}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.ccaName}>{opt.name}</Text>
-                  <Text style={styles.ccaDesc}>{opt.description}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-          {!selectedCCA && <Text style={styles.helper}>Select a CCA to continue</Text>}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Choose a CCA</Text>
+        <View>
+          {CCA_OPTIONS.map((opt) => (
+            <TouchableOpacity key={opt.id} style={[styles.ccaItem, selectedCCA === opt.id && styles.ccaItemActive]} onPress={() => setSelectedCCA(opt.id)}>
+              <Text style={styles.ccaEmoji}>{opt.emoji}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.ccaName}>{opt.name}</Text>
+                <Text style={styles.ccaDesc}>{opt.description}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
-      )}
+        {!selectedCCA && <Text style={styles.helper}>Select a CCA to continue</Text>}
+      </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Daily Food Habit</Text>
@@ -154,12 +152,13 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       <TouchableOpacity disabled={!canConfirm} onPress={confirmYear} style={[styles.confirm, !canConfirm && styles.confirmDisabled]}>
         <Text style={styles.confirmText}>Confirm Year</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16 },
+  scrollContent: { paddingBottom: 40 },
   title: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginBottom: 4, textAlign: 'center' },
   subtitle: { fontSize: 12, color: '#7F8C8D', textAlign: 'center', marginBottom: 12 },
   remaining: { textAlign: 'center', marginBottom: 8, color: '#7F8C8D', fontWeight: '700' },
