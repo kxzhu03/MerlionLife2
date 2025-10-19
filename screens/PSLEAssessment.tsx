@@ -53,7 +53,7 @@ const PSLEAssessment: React.FC<Props> = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16 },
+  container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16, paddingTop: 30 },
   title: { fontSize: 22, fontWeight: 'bold', color: '#2C3E50', textAlign: 'center', marginVertical: 12 },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 16 },
   row: { fontSize: 14, color: '#34495E', marginBottom: 6 },

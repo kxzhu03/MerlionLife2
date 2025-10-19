@@ -85,11 +85,6 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   };
 
   const scrollRef = useRef<ScrollView>(null);
-  const [scrollY, setScrollY] = useState(0);
-  const scrollBy = (delta: number) => {
-    const target = Math.max(0, scrollY + delta);
-    scrollRef.current?.scrollTo({ y: target, animated: true });
-  };
 
   return (
     <View style={styles.container}>
@@ -100,8 +95,6 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={true}
         overScrollMode="always"
-        onScroll={(e) => setScrollY(e.nativeEvent.contentOffset.y)}
-        scrollEventThrottle={16}
       >
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -176,14 +169,6 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
         <Text style={styles.confirmText}>Confirm Year</Text>
       </TouchableOpacity>
       </ScrollView>
-      <View style={styles.fabContainer} pointerEvents="box-none">
-        <TouchableOpacity style={styles.fabButton} onPress={() => scrollBy(-300)}>
-          <Text style={styles.fabText}>↑</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.fabButton, { marginTop: 8 }]} onPress={() => scrollBy(300)}>
-          <Text style={styles.fabText}>↓</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -192,14 +177,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   scroll: { flex: 1 },
   webScroll: { overflow: 'auto' },
-  scrollContent: { padding: 16, paddingBottom: 40 },
+  scrollContent: { paddingTop: 30, paddingHorizontal: 16, paddingBottom: 40 },
   navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 8, marginTop: 10, position: 'relative' },
   backBtn: { paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: '#EAF2F8', position: 'absolute', left: 0 },
   backText: { color: '#4A90E2', fontWeight: '700' },
-  fabContainer: { position: 'absolute', right: 16, bottom: 16, alignItems: 'center' },
-  fabButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#4A90E2', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4 },
-  fabText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  
   title: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginBottom: 4, textAlign: 'center' },
   subtitle: { fontSize: 12, color: '#7F8C8D', textAlign: 'center', marginBottom: 12 },
   remaining: { textAlign: 'center', marginBottom: 8, color: '#7F8C8D', fontWeight: '700' },

@@ -73,7 +73,7 @@ const CharacterCreation: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16 },
+  container: { flex: 1, backgroundColor: '#F5F7FA', padding: 16, paddingTop: 30 },
   title: { fontSize: 24, fontWeight: 'bold', color: '#2C3E50', marginVertical: 12, textAlign: 'center' },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 16 },
   label: { fontSize: 14, fontWeight: '600', color: '#34495E', marginTop: 12 },
