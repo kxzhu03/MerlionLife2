@@ -19,7 +19,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
     if (!gameState) {
       GameService.loadGameState().then((gs) => { if (gs) setGameState(gs); });
     }
-  }, []);
+  }, [gameState]);
 
   if (!gameState) return null;
 
