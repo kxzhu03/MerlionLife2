@@ -82,7 +82,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
     <View style={styles.container}>
       <ScrollView
         ref={scrollRef}
-        style={styles.scroll}
+        style={[styles.scroll, styles.webScroll]}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={true}
@@ -98,7 +98,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <View style={styles.fabContainer}>
+      <View style={styles.fabContainer} pointerEvents="box-none">
         <TouchableOpacity style={styles.fabButton} onPress={() => scrollBy(-300)}>
           <Text style={styles.fabText}>↑</Text>
         </TouchableOpacity>
@@ -113,6 +113,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   scroll: { flex: 1 },
+  webScroll: { overflow: 'auto' },
   scrollContent: { padding: 16, paddingBottom: 40 },
   header: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginVertical: 8, textAlign: 'center' },
   actions: { marginTop: 16 },

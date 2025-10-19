@@ -91,7 +91,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     <View style={styles.container}>
       <ScrollView
         ref={scrollRef}
-        style={styles.scroll}
+        style={[styles.scroll, styles.webScroll]}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={true}
@@ -154,7 +154,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
         <Text style={styles.confirmText}>Confirm Year</Text>
       </TouchableOpacity>
       </ScrollView>
-      <View style={styles.fabContainer}>
+      <View style={styles.fabContainer} pointerEvents="box-none">
         <TouchableOpacity style={styles.fabButton} onPress={() => scrollBy(-300)}>
           <Text style={styles.fabText}>↑</Text>
         </TouchableOpacity>
@@ -169,6 +169,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   scroll: { flex: 1 },
+  webScroll: { overflow: 'auto' },
   scrollContent: { padding: 16, paddingBottom: 40 },
   navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   backBtn: { paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: '#EAF2F8', alignSelf: 'flex-start' },
