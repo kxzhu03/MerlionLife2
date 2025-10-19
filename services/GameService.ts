@@ -106,9 +106,7 @@ export class GameService {
   }
 
   static applyRandomEvent(): RandomEvent | null {
-    // 30% chance that any random event happens this year
-    const trigger = Math.random() < 0.3;
-    if (!trigger) return null;
+    // 100% chance: exactly one random event per year
     const index = Math.floor(Math.random() * RANDOM_EVENTS.length);
     return RANDOM_EVENTS[index].id;
   }

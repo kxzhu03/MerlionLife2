@@ -88,6 +88,11 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       showsVerticalScrollIndicator={true}
       overScrollMode="always"
     >
+      <View style={styles.navRow}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={styles.title}>Plan Year {gameState.player.currentYear}</Text>
       <Text style={styles.subtitle}>Distribute 10 activity points</Text>
       <ActivitySlider label="Academics" value={academics} maxValue={ACTIVITY_POINTS_PER_YEAR - (cca + volunteering)} onChange={setAcademics} icon="📚" color="#2196F3" />
@@ -144,6 +149,9 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   scrollContent: { padding: 16, paddingBottom: 40 },
+  navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  backBtn: { paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: '#EAF2F8', alignSelf: 'flex-start' },
+  backText: { color: '#4A90E2', fontWeight: '700' },
   title: { fontSize: 18, fontWeight: 'bold', color: '#2C3E50', marginBottom: 4, textAlign: 'center' },
   subtitle: { fontSize: 12, color: '#7F8C8D', textAlign: 'center', marginBottom: 12 },
   remaining: { textAlign: 'center', marginBottom: 8, color: '#7F8C8D', fontWeight: '700' },
