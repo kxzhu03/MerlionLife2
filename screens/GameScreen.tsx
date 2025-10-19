@@ -35,6 +35,11 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
   // Show random event popup at the start of the year
   useEffect(() => {
     if (!gameState || hasShownEventForYear) return;
+    // Gate by lastRandomEventYear to ensure once per year even after resume
+    if (gameState.lastRandomEventYear === gameState.player.currentYear) {
+      setHasShownEventForYear(true);
+      return;
+    }
     const event = GameService.applyRandomEvent();
     if (!event) {
       setHasShownEventForYear(true);
@@ -57,7 +62,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
         };
       }
     }
-    const updatedState: GameState = { ...gameState, player: updatedPlayer };
+    const updatedState: GameState = { ...gameState, player: updatedPlayer, lastRandomEventYear: gameState.player.currentYear };
     setGameState(updatedState);
     GameService.saveGameState(updatedState);
     setHasShownEventForYear(true);

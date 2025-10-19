@@ -119,4 +119,5 @@ export interface GameState {
   currentYear: number;
   isGameComplete: boolean;
   gamePhase: 'primary' | 'secondary' | 'completed';
+  lastRandomEventYear?: number;
 }

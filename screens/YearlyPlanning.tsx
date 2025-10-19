@@ -23,6 +23,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   const [mealHealthy, setMealHealthy] = useState<boolean>(canAffordHealthyInit);
   const [tuitionSelected, setTuitionSelected] = useState<string[]>([]);
   const [selectedCCA, setSelectedCCA] = useState<string | null>(gameState.player.cca || null);
+  const [ccaOpen, setCcaOpen] = useState<boolean>(false);
+  const [showTuitionInfo, setShowTuitionInfo] = useState<boolean>(false);
 
   const remaining = ACTIVITY_POINTS_PER_YEAR - (academics + cca + volunteering);
   const mealChoice = mealHealthy ? MealChoice.HEALTHY : MealChoice.UNHEALTHY;
@@ -101,12 +103,15 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
         onScroll={(e) => setScrollY(e.nativeEvent.contentOffset.y)}
         scrollEventThrottle={16}
       >
-      <View style={styles.navRow}>
+      <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
+        <Text style={styles.title}>Plan Year {gameState.player.currentYear}</Text>
       </View>
-      <Text style={styles.title}>Plan Year {gameState.player.currentYear}</Text>
+      {ccaOpen && (
+        <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={() => setCcaOpen(false)} />
+      )}
       <Text style={styles.subtitle}>Distribute 10 activity points</Text>
       <ActivitySlider label="Academics" value={academics} maxValue={ACTIVITY_POINTS_PER_YEAR - (cca + volunteering)} onChange={setAcademics} icon="📚" color="#2196F3" />
       <ActivitySlider label="CCA / Skill" value={cca} maxValue={ACTIVITY_POINTS_PER_YEAR - (academics + volunteering)} onChange={setCca} icon="🎯" color="#00BCD4" />
@@ -115,16 +120,21 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Choose a CCA</Text>
-        <View>
-          {CCA_OPTIONS.map((opt) => (
-            <TouchableOpacity key={opt.id} style={[styles.ccaItem, selectedCCA === opt.id && styles.ccaItemActive]} onPress={() => setSelectedCCA(opt.id)}>
-              <Text style={styles.ccaEmoji}>{opt.emoji}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.ccaName}>{opt.name}</Text>
-                <Text style={styles.ccaDesc}>{opt.description}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+        <View style={styles.dropdownContainer}>
+          <TouchableOpacity onPress={() => setCcaOpen(!ccaOpen)} style={styles.dropdownToggle}>
+            <Text style={styles.dropdownText}>{selectedCCA ? (CCA_OPTIONS.find(o => o.id === selectedCCA)?.name || 'Select a CCA') : 'Select a CCA'}</Text>
+            <Text style={styles.dropdownCaret}>{ccaOpen ? '▲' : '▼'}</Text>
+          </TouchableOpacity>
+          {ccaOpen && (
+            <View style={styles.dropdownMenu}>
+              {CCA_OPTIONS.map((opt) => (
+                <TouchableOpacity key={opt.id} style={styles.dropdownItem} onPress={() => { setSelectedCCA(opt.id); setCcaOpen(false); }}>
+                  <Text style={styles.ccaEmoji}>{opt.emoji}</Text>
+                  <Text style={styles.dropdownItemText}>{opt.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
         {!selectedCCA && <Text style={styles.helper}>Select a CCA to continue</Text>}
       </View>
@@ -142,7 +152,17 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Tuition (Max {maxTuition})</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.cardTitle}>Tuition (Max {maxTuition})</Text>
+          <View style={styles.infoWrap} onMouseEnter={() => setShowTuitionInfo(true)} onMouseLeave={() => setShowTuitionInfo(false)}>
+            <Text style={styles.infoIcon}>i</Text>
+            {showTuitionInfo && (
+              <View style={styles.tooltip}>
+                <Text style={styles.tooltipText}>Max subjects by SES: Lower=0, Middle=1, Upper=2. Yours: {maxTuition}</Text>
+              </View>
+            )}
+          </View>
+        </View>
         <View style={styles.tuitionRow}>
           {['Math', 'English', 'Science'].map((s) => (
             <TouchableOpacity key={s} onPress={() => toggleTuition(s)} style={[styles.tuitionPill, tuitionSelected.includes(s) && styles.tuitionPillActive, tuitionSelected.length >= maxTuition && !tuitionSelected.includes(s) && styles.tuitionPillDisabled]}>
@@ -174,7 +194,7 @@ const styles = StyleSheet.create({
   webScroll: { overflow: 'auto' },
   scrollContent: { padding: 16, paddingBottom: 40 },
   navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, marginTop: 10 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 8, marginTop: 10 },
   backBtn: { paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: '#EAF2F8', alignSelf: 'flex-start' },
   backText: { color: '#4A90E2', fontWeight: '700' },
   fabContainer: { position: 'absolute', right: 16, bottom: 16, alignItems: 'center' },
@@ -202,6 +222,18 @@ const styles = StyleSheet.create({
   ,ccaEmoji: { fontSize: 22, marginRight: 10 }
   ,ccaName: { fontSize: 14, fontWeight: '700', color: '#2C3E50' }
   ,ccaDesc: { fontSize: 12, color: '#7F8C8D' }
+  ,dropdownToggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F0F3F4', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8 }
+  ,dropdownText: { fontSize: 14, color: '#2C3E50' }
+  ,dropdownCaret: { fontSize: 12, color: '#7F8C8D' }
+  ,dropdownMenu: { backgroundColor: '#fff', borderRadius: 8, marginTop: 6, paddingVertical: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 }
+  ,dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12 }
+  ,dropdownItemText: { marginLeft: 8, fontSize: 14, color: '#2C3E50' }
+  ,dropdownContainer: { marginTop: 8, position: 'relative' }
+  ,infoWrap: { position: 'relative' }
+  ,infoIcon: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#EAF2F8', color: '#4A90E2', textAlign: 'center', lineHeight: 20, fontWeight: '700' }
+  ,tooltip: { position: 'absolute', top: 24, right: 0, maxWidth: 240, backgroundColor: '#2C3E50', padding: 8, borderRadius: 6 }
+  ,tooltipText: { color: '#fff', fontSize: 12 }
+  ,backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }
 });
 
 export default YearlyPlanning;
