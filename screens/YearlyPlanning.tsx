@@ -18,7 +18,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   const [academics, setAcademics] = useState(0);
   const [cca, setCca] = useState(0);
   const [volunteering, setVolunteering] = useState(0);
-  const canAffordHealthyInit = route.params.gameState.player.dailyAllowance >= HEALTHY_MEAL_COST;
+  const initYearlyBudget = route.params.gameState.player.stats.wealth + (route.params.gameState.player.dailyAllowance * 365);
+  const canAffordHealthyInit = (initYearlyBudget - (HEALTHY_MEAL_COST * 365)) > 0;
   const [mealHealthy, setMealHealthy] = useState<boolean>(canAffordHealthyInit);
   const [tuitionSelected, setTuitionSelected] = useState<string[]>([]);
   const [selectedCCA, setSelectedCCA] = useState<string | null>(gameState.player.cca || null);
@@ -65,8 +66,9 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  const canAffordHealthy = gameState.player.dailyAllowance >= HEALTHY_MEAL_COST;
-  const canAffordUnhealthy = gameState.player.dailyAllowance >= UNHEALTHY_MEAL_COST;
+  const yearlyBudget = gameState.player.stats.wealth + (gameState.player.dailyAllowance * 365);
+  const canAffordHealthy = (yearlyBudget - (HEALTHY_MEAL_COST * 365)) > 0;
+  const canAffordUnhealthy = (yearlyBudget - (UNHEALTHY_MEAL_COST * 365)) > 0;
 
   const onToggleMeal = (val: boolean) => {
     if (val && !canAffordHealthy) {
@@ -172,6 +174,7 @@ const styles = StyleSheet.create({
   webScroll: { overflow: 'auto' },
   scrollContent: { padding: 16, paddingBottom: 40 },
   navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  navRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, marginTop: 10 },
   backBtn: { paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: '#EAF2F8', alignSelf: 'flex-start' },
   backText: { color: '#4A90E2', fontWeight: '700' },
   fabContainer: { position: 'absolute', right: 16, bottom: 16, alignItems: 'center' },
