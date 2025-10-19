@@ -27,6 +27,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.navigate('YearlyPlanning', { gameState });
   };
 
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>🎒 Primary School — Year {gameState.player.currentYear}</Text>

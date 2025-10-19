@@ -10,7 +10,7 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
       socialImpact: 30,
       academicSkill: 20
     },
-    dailyAllowanceRange: [1, 2],
+    dailyAllowanceRange: [2, 2],
     maxTuitionSubjects: 0,
     parentsOccupation: 'Taxi Driver & Hawker'
   },

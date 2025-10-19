@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, Alert } from 'react-n
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import { ACTIVITY_POINTS_PER_YEAR, HEALTHY_MEAL_COST, UNHEALTHY_MEAL_COST, SES_CONFIG } from '../data/constants';
+import { ACTIVITY_POINTS_PER_YEAR, HEALTHY_MEAL_COST, UNHEALTHY_MEAL_COST, SES_CONFIG, CCA_OPTIONS } from '../data/constants';
 import { ActivityPoints, GameState, MealChoice, Player, RandomEvent, SESClass } from '../types';
 import ActivitySlider from '../components/ActivitySlider';
 import { GameService } from '../services/GameService';
@@ -20,13 +20,15 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   const [volunteering, setVolunteering] = useState(0);
   const [mealHealthy, setMealHealthy] = useState(true);
   const [tuitionSelected, setTuitionSelected] = useState<string[]>([]);
+  const [selectedCCA, setSelectedCCA] = useState<string | null>(gameState.player.cca || null);
 
   const remaining = ACTIVITY_POINTS_PER_YEAR - (academics + cca + volunteering);
   const mealChoice = mealHealthy ? MealChoice.HEALTHY : MealChoice.UNHEALTHY;
 
   const maxTuition = SES_CONFIG[gameState.player.sesClass].maxTuitionSubjects;
 
-  const canConfirm = remaining === 0;
+  const isPrimaryOne = gameState.player.currentYear === 1;
+  const canConfirm = remaining === 0 && (!isPrimaryOne || !!selectedCCA);
 
   const toggleTuition = (subject: string) => {
     if (tuitionSelected.includes(subject)) {
@@ -39,7 +41,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const confirmYear = async () => {
     if (!canConfirm) return;
-    const player: Player = { ...gameState.player, mealChoice, tuitionSubjects: tuitionSelected };
+    const player: Player = { ...gameState.player, mealChoice, tuitionSubjects: tuitionSelected, cca: (selectedCCA as any) || gameState.player.cca };
     const ap: ActivityPoints = { academics, cca, volunteering };
     // Yearly calculations
     const { statsChange, wealthChange } = GameService.calculateYearlyStats(player, ap, mealChoice);
@@ -84,6 +86,21 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
+  const canAffordHealthy = gameState.player.dailyAllowance >= HEALTHY_MEAL_COST;
+  const canAffordUnhealthy = gameState.player.dailyAllowance >= UNHEALTHY_MEAL_COST;
+
+  const onToggleMeal = (val: boolean) => {
+    if (val && !canAffordHealthy) {
+      Alert.alert('Not enough allowance', `Healthy meals cost S$${HEALTHY_MEAL_COST}/day.`);
+      return;
+    }
+    if (!val && !canAffordUnhealthy) {
+      Alert.alert('Not enough allowance', `Unhealthy meals cost S$${UNHEALTHY_MEAL_COST}/day.`);
+      return;
+    }
+    setMealHealthy(val);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Plan Year {gameState.player.currentYear}</Text>
@@ -93,14 +110,32 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       <ActivitySlider label="Volunteering" value={volunteering} maxValue={ACTIVITY_POINTS_PER_YEAR - (academics + cca)} onChange={setVolunteering} icon="🤝" color="#9C27B0" />
       <Text style={styles.remaining}>Remaining: {remaining} pts</Text>
 
+      {isPrimaryOne && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Choose a CCA</Text>
+          <View>
+            {CCA_OPTIONS.map((opt) => (
+              <TouchableOpacity key={opt.id} style={[styles.ccaItem, selectedCCA === opt.id && styles.ccaItemActive]} onPress={() => setSelectedCCA(opt.id)}>
+                <Text style={styles.ccaEmoji}>{opt.emoji}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.ccaName}>{opt.name}</Text>
+                  <Text style={styles.ccaDesc}>{opt.description}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {!selectedCCA && <Text style={styles.helper}>Select a CCA to continue</Text>}
+        </View>
+      )}
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Daily Food Habit</Text>
         <View style={styles.rowBetween}>
           <Text style={styles.helper}>{mealHealthy ? `Healthy (S$${HEALTHY_MEAL_COST}/day)` : `Unhealthy (S$${UNHEALTHY_MEAL_COST}/day)`}</Text>
           <View style={styles.row}> 
-            <Text>Unhealthy</Text>
-            <Switch value={mealHealthy} onValueChange={setMealHealthy} />
-            <Text>Healthy</Text>
+            <Text style={!canAffordUnhealthy ? { opacity: 0.4 } : undefined}>Unhealthy</Text>
+            <Switch value={mealHealthy} onValueChange={onToggleMeal} />
+            <Text style={!canAffordHealthy ? { opacity: 0.4 } : undefined}>Healthy</Text>
           </View>
         </View>
       </View>
@@ -142,6 +177,11 @@ const styles = StyleSheet.create({
   confirm: { backgroundColor: '#27AE60', paddingVertical: 14, borderRadius: 12, marginTop: 16 },
   confirmDisabled: { backgroundColor: '#A3E4D7' },
   confirmText: { color: '#fff', textAlign: 'center', fontWeight: '700', fontSize: 16 }
+  ,ccaItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 10, borderRadius: 10, backgroundColor: '#F8F9F9', marginTop: 8 }
+  ,ccaItemActive: { backgroundColor: '#EAF2F8' }
+  ,ccaEmoji: { fontSize: 22, marginRight: 10 }
+  ,ccaName: { fontSize: 14, fontWeight: '700', color: '#2C3E50' }
+  ,ccaDesc: { fontSize: 12, color: '#7F8C8D' }
 });
 
 export default YearlyPlanning;

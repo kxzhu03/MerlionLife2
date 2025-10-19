@@ -49,8 +49,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
           color="#9C27B0"
           icon="🤝"
         />
+        <Text style={styles.sectionTitle}>Skills</Text>
         <StatBar
-          label="Academic Skill"
+          label="Academic"
           value={player.stats.academicSkill}
           maxValue={100}
           color="#2196F3"
@@ -58,7 +59,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
         />
         {player.cca && (
           <StatBar
-            label={`${player.cca} Skill`}
+            label={`${player.cca}`}
             value={player.ccaSkill}
             maxValue={100}
             color="#00BCD4"
@@ -121,6 +122,13 @@ const styles = StyleSheet.create({
   },
   stats: {
     marginTop: 8,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#34495E',
+    marginTop: 8,
+    marginBottom: 4
   },
   footer: {
     marginTop: 12,
