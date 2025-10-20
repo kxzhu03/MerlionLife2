@@ -8,6 +8,7 @@ import { RootStackParamList } from './types/navigation';
 import CharacterCreation from './screens/CharacterCreation';
 import GameScreen from './screens/GameScreen';
 import YearlyPlanning from './screens/YearlyPlanning';
+import SkillsScreen from './screens/SkillsScreen';
 import PSLEAssessment from './screens/PSLEAssessment';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -21,6 +22,7 @@ const App = () => {
         <Stack.Screen name="Game" component={GameScreen} />
         <Stack.Screen name="YearlyPlanning" component={YearlyPlanning} />
         <Stack.Screen name="PSLEAssessment" component={PSLEAssessment} />
+        <Stack.Screen name="Skills" component={SkillsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
