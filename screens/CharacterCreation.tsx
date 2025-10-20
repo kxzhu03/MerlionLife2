@@ -67,7 +67,7 @@ const CharacterCreation: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
 
-        <Text style={styles.helper}>{SES_CONFIG[sesClass].parentsOccupations[0]}</Text>
+        
 
         <TouchableOpacity disabled={!canContinue} onPress={handleStart} style={[styles.startBtn, !canContinue && styles.startBtnDisabled]}>
           <Text style={styles.startText}>Start Primary 1</Text>
