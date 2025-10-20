@@ -6,7 +6,7 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
     startingStats: {
       wealth: 0,
       happiness: 60,
-      health: 60,
+      health: 50,
       socialImpact: 30,
       academicSkill: 20
     },
@@ -23,7 +23,7 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
   [SESClass.MIDDLE]: {
     class: SESClass.MIDDLE,
     startingStats: {
-      wealth: 100,
+      wealth: 1000,
       happiness: 65,
       health: 70,
       socialImpact: 35,
@@ -42,10 +42,10 @@ export const SES_CONFIG: Record<SESClass, SESData> = {
   [SESClass.UPPER]: {
     class: SESClass.UPPER,
     startingStats: {
-      wealth: 300,
+      wealth: 3000,
       happiness: 70,
       health: 75,
-      socialImpact: 40,
+      socialImpact: 50,
       academicSkill: 30
     },
     dailyAllowanceRange: [10, 20],
