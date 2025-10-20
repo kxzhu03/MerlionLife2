@@ -12,11 +12,12 @@ interface Props {
   navigation: NavProp;
 }
 
-const AVATARS = ['😀','😎','🤓','🥳','🧑‍🦱','🧒','👧','🧑‍🎓'];
+const BOY_AVATARS = ['👦','👦🏻','👦🏼','👦🏽','👦🏾','👦🏿'];
+const GIRL_AVATARS = ['👧','👧🏻','👧🏼','👧🏽','👧🏾','👧🏿'];
 
 const CharacterCreation: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState(AVATARS[0]);
+  const [avatar, setAvatar] = useState(BOY_AVATARS[0]);
   const [sesClass] = useState<SESClass>(() => {
     const options = [SESClass.LOWER, SESClass.MIDDLE, SESClass.UPPER];
     return options[Math.floor(Math.random() * options.length)];
@@ -49,20 +50,24 @@ const CharacterCreation: React.FC<Props> = ({ navigation }) => {
         <TextInput value={name} onChangeText={setName} placeholder="Enter name" style={styles.input} />
 
         <Text style={styles.label}>Avatar</Text>
-        <FlatList
-          data={AVATARS}
-          keyExtractor={(i) => i}
-          horizontal
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => setAvatar(item)} style={[styles.avatarItem, avatar === item && styles.avatarSelected]}>
-              <Text style={styles.avatarText}>{item}</Text>
-            </TouchableOpacity>
-          )}
-          style={styles.avatarList}
-          showsHorizontalScrollIndicator={false}
-        />
+        <View style={styles.avatarList}>
+          <View style={styles.avatarRow}>
+            {BOY_AVATARS.map((item) => (
+              <TouchableOpacity key={item} onPress={() => setAvatar(item)} style={[styles.avatarItem, avatar === item && styles.avatarSelected]}>
+                <Text style={styles.avatarText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.avatarRow}>
+            {GIRL_AVATARS.map((item) => (
+              <TouchableOpacity key={item} onPress={() => setAvatar(item)} style={[styles.avatarItem, avatar === item && styles.avatarSelected]}>
+                <Text style={styles.avatarText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-        <Text style={styles.helper}>{sesData.parentsOccupation}</Text>
+        <Text style={styles.helper}>{SES_CONFIG[sesClass].parentsOccupations[0]}</Text>
 
         <TouchableOpacity disabled={!canContinue} onPress={handleStart} style={[styles.startBtn, !canContinue && styles.startBtnDisabled]}>
           <Text style={styles.startText}>Start Primary 1</Text>
@@ -79,6 +84,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, fontWeight: '600', color: '#34495E', marginTop: 12 },
   input: { backgroundColor: '#F0F3F4', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginTop: 6 },
   avatarList: { marginTop: 8 },
+  avatarRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 8 },
   avatarItem: { backgroundColor: '#F0F3F4', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, marginRight: 8 },
   avatarSelected: { backgroundColor: '#D6EAF8' },
   avatarText: { fontSize: 24 },
