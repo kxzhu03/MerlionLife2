@@ -147,15 +147,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       <View style={styles.card}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>Tuition (Max {maxTuition})</Text>
-          <View style={styles.infoWrap} onMouseEnter={() => setShowTuitionInfo(true)} onMouseLeave={() => setShowTuitionInfo(false)}>
-            <Text style={styles.infoIcon}>i</Text>
-            {showTuitionInfo && (
-              <View style={styles.tooltip}>
-                <Text style={styles.tooltipText}>Max subjects by SES: Lower=0, Middle=1, Upper=2. Yours: {maxTuition}</Text>
-              </View>
-            )}
-          </View>
         </View>
+        <Text style={[styles.helper, { marginTop: 4 }]}>Max subjects depend on SES (Lower=0, Middle=1, Upper=2). Your cap: {maxTuition}.</Text>
         <View style={styles.tuitionRow}>
           {['Math', 'English', 'Science'].map((s) => (
             <TouchableOpacity key={s} onPress={() => toggleTuition(s)} style={[styles.tuitionPill, tuitionSelected.includes(s) && styles.tuitionPillActive, tuitionSelected.length >= maxTuition && !tuitionSelected.includes(s) && styles.tuitionPillDisabled]}>

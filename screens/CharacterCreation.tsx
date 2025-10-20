@@ -12,8 +12,8 @@ interface Props {
   navigation: NavProp;
 }
 
-const BOY_AVATARS = ['👦','👦🏻','👦🏼','👦🏽','👦🏾','👦🏿'];
-const GIRL_AVATARS = ['👧','👧🏻','👧🏼','👧🏽','👧🏾','👧🏿'];
+const BOY_AVATARS = ['👦','👦🏻','👦🏼','👦🏽','👦🏾'];
+const GIRL_AVATARS = ['👧','👧🏻','👧🏼','👧🏽','👧🏾'];
 
 const CharacterCreation: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState('');

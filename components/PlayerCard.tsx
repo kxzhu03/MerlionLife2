@@ -16,7 +16,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
           <Text style={styles.name}>{player.name}</Text>
           <Text style={styles.details}>Age {player.age} | Primary {player.grade}</Text>
           <Text style={styles.ses}>{player.sesClass.toUpperCase()} CLASS</Text>
-          <Text style={styles.occupation}>{player.parentsOccupation}</Text>
+          <Text style={styles.occupation}>{"Parents' occupation: "}{player.parentsOccupation}</Text>
         </View>
       </View>
       
