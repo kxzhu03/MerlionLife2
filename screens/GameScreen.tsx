@@ -93,26 +93,12 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
         showsVerticalScrollIndicator={true}
         overScrollMode="always"
       >
-        <View style={styles.topQuarter}>
-          <Text style={styles.headerName}>{gameState.player.name}</Text>
-          <Text style={styles.headerMeta}>Primary {gameState.player.grade} • {gameState.player.parentsOccupation}</Text>
-          <Text style={styles.headerMeta}>{gameState.player.sesClass.toUpperCase()} CLASS • Allowance S${gameState.player.dailyAllowance}/day</Text>
-        </View>
-        <View style={styles.bottomQuarter}>
-          <View style={styles.rowStats}>
-            <View style={styles.statCell}><Text>💰</Text><Text style={styles.statValue}>S${gameState.player.stats.wealth}</Text></View>
-            <View style={styles.statCell}><Text>😊</Text><Text style={styles.statValue}>{gameState.player.stats.happiness}</Text></View>
-            <View style={styles.statCell}><Text>❤️</Text><Text style={styles.statValue}>{gameState.player.stats.health}</Text></View>
-            <View style={styles.statCell}><Text>🤝</Text><Text style={styles.statValue}>{gameState.player.stats.socialImpact}</Text></View>
-          </View>
-          <View style={styles.actions}>
-            <TouchableOpacity style={[styles.primary, { marginRight: 8 }]} onPress={goPlanYear}>
-              <Text style={styles.primaryText}>Plan This Year</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.secondary]} onPress={() => navigation.navigate('Skills', { gameState })}>
-              <Text style={styles.secondaryText}>View Skills</Text>
-            </TouchableOpacity>
-          </View>
+        <Text style={styles.header}>🎒 Primary School — Year {gameState.player.currentYear}</Text>
+        <PlayerCard player={gameState.player} />
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.primary} onPress={goPlanYear}>
+            <Text style={styles.primaryText}>Plan This Year</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -128,15 +114,6 @@ const styles = StyleSheet.create({
   actions: { marginTop: 16 },
   primary: { backgroundColor: '#4A90E2', paddingVertical: 14, borderRadius: 12 },
   primaryText: { color: '#fff', textAlign: 'center', fontWeight: '700', fontSize: 16 }
-  ,topQuarter: { minHeight: 180, justifyContent: 'center', alignItems: 'center' }
-  ,headerName: { fontSize: 24, fontWeight: '800', color: '#2C3E50' }
-  ,headerMeta: { fontSize: 12, color: '#7F8C8D', marginTop: 4 }
-  ,bottomQuarter: { marginTop: 24 }
-  ,rowStats: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }
-  ,statCell: { backgroundColor: '#fff', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, flex: 1, marginHorizontal: 4, alignItems: 'center' }
-  ,statValue: { marginTop: 4, fontWeight: '700', color: '#2C3E50' }
-  ,secondary: { backgroundColor: '#FFFFFF', paddingVertical: 14, borderRadius: 12, borderWidth: 2, borderColor: '#4A90E2' }
-  ,secondaryText: { color: '#4A90E2', textAlign: 'center', fontWeight: '700', fontSize: 16 }
 });
 
 export default GameScreen;

@@ -12,7 +12,7 @@ interface Props {
   navigation: NavProp;
 }
 
-const AVATARS = ['👦','👧'];
+const AVATARS = ['😀','😎','🤓','🥳','🧑‍🦱','🧒','👧','🧑‍🎓'];
 
 const CharacterCreation: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -62,7 +62,7 @@ const CharacterCreation: React.FC<Props> = ({ navigation }) => {
           showsHorizontalScrollIndicator={false}
         />
 
-        <Text style={styles.helper}>{sesData.parentsOccupations[0]}</Text>
+        <Text style={styles.helper}>{sesData.parentsOccupation}</Text>
 
         <TouchableOpacity disabled={!canContinue} onPress={handleStart} style={[styles.startBtn, !canContinue && styles.startBtnDisabled]}>
           <Text style={styles.startText}>Start Primary 1</Text>
