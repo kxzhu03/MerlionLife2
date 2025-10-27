@@ -155,7 +155,7 @@ export class HealthService {
   /**
    * Calculate health deterioration over time
    */
-  static calculateHealthDeterior ation(player: Player): Player {
+  static calculateHealthDeterioration(player: Player): Player {
     const updatedPlayer = { ...player };
     let healthChange = 0;
 

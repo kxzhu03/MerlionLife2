@@ -116,7 +116,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
     const desc = eventData ? eventData.description : event.replace(/_/g, ' ');
     
     Alert.alert(title, `${desc}\n\n${deltaText}`);
-  }, [gameState, hasShownEventForYear]);
+  }, [gameState, hasShownEventForYear, gameState?.player.currentYear]);
 
   // Show achievement notifications
   useEffect(() => {

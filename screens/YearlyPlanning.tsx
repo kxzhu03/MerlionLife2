@@ -195,24 +195,16 @@ const styles = StyleSheet.create({
   tuitionTextActive: { color: '#fff' },
   confirm: { backgroundColor: '#27AE60', paddingVertical: 14, borderRadius: 12, marginTop: 16 },
   confirmDisabled: { backgroundColor: '#A3E4D7' },
-  confirmText: { color: '#fff', textAlign: 'center', fontWeight: '700', fontSize: 16 }
-  ,ccaItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 10, borderRadius: 10, backgroundColor: '#F8F9F9', marginTop: 8 }
-  ,ccaItemActive: { backgroundColor: '#EAF2F8' }
-  ,ccaEmoji: { fontSize: 22, marginRight: 10 }
-  ,ccaName: { fontSize: 14, fontWeight: '700', color: '#2C3E50' }
-  ,ccaDesc: { fontSize: 12, color: '#7F8C8D' }
-  ,dropdownToggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F0F3F4', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8 }
-  ,dropdownText: { fontSize: 14, color: '#2C3E50' }
-  ,dropdownCaret: { fontSize: 12, color: '#7F8C8D' }
-  ,dropdownMenu: { backgroundColor: '#fff', borderRadius: 8, marginTop: 6, paddingVertical: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 }
-  ,dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12 }
-  ,dropdownItemText: { marginLeft: 8, fontSize: 14, color: '#2C3E50' }
-  ,dropdownContainer: { marginTop: 8, position: 'relative' }
-  ,infoWrap: { position: 'relative' }
-  ,infoIcon: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#EAF2F8', color: '#4A90E2', textAlign: 'center', lineHeight: 20, fontWeight: '700' }
-  ,tooltip: { position: 'absolute', top: 24, right: 0, maxWidth: 240, backgroundColor: '#2C3E50', padding: 8, borderRadius: 6 }
-  ,tooltipText: { color: '#fff', fontSize: 12 }
-  ,backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }
+  confirmText: { color: '#fff', textAlign: 'center', fontWeight: '700', fontSize: 16 },
+  ccaEmoji: { fontSize: 22, marginRight: 10 },
+  dropdownToggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F0F3F4', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8 },
+  dropdownText: { fontSize: 14, color: '#2C3E50' },
+  dropdownCaret: { fontSize: 12, color: '#7F8C8D' },
+  dropdownMenu: { backgroundColor: '#fff', borderRadius: 8, marginTop: 6, paddingVertical: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
+  dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12 },
+  dropdownItemText: { marginLeft: 8, fontSize: 14, color: '#2C3E50' },
+  dropdownContainer: { marginTop: 8, position: 'relative' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }
 });
 
 export default YearlyPlanning;

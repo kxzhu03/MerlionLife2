@@ -90,9 +90,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4A90E2',
   },
-  slider: {
-    height: 40,
-  },
   stepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
