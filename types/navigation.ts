@@ -6,4 +6,5 @@ export type RootStackParamList = {
   Game: { gameState: GameState };
   YearlyPlanning: { gameState: GameState };
   PSLEAssessment: { gameState: GameState };
+  Profile: { gameState: GameState };
 };

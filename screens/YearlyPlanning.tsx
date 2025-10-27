@@ -53,6 +53,9 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
     // Random events are handled at the start of the next year (on Game screen)
     let finalPlayer = updatedWithCCA;
+    
+    // Check for achievements
+    finalPlayer = GameService.checkAchievements(finalPlayer);
 
     // Advance year
     const advanced = GameService.advanceToNextYear(finalPlayer);

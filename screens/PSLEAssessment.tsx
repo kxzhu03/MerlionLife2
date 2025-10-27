@@ -28,7 +28,11 @@ const PSLEAssessment: React.FC<Props> = ({ navigation, route }) => {
   const special = GameService.checkSpecialProgramEligibility(player.ccaSkill);
 
   const continueToSecondary = async () => {
-    const next: GameState = { ...gameState, gamePhase: 'secondary' };
+    // Update player with PSLE stream
+    const updatedPlayer = { ...player, psleStream: stream };
+    // Check achievements (Scholar achievement)
+    const finalPlayer = GameService.checkAchievements(updatedPlayer);
+    const next: GameState = { ...gameState, player: finalPlayer, gamePhase: 'secondary' };
     await GameService.saveGameState(next);
     // For now, end here with a simple loop back to Welcome or Game
     navigation.navigate('Welcome');

@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Player } from '../types';
-import StatBar from './StatBar';
+import EnhancedStatBar from './EnhancedStatBar';
 
 interface PlayerCardProps {
   player: Player;
+  statsChanges?: Partial<Record<keyof Player['stats'], number>>;
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
+const PlayerCard: React.FC<PlayerCardProps> = ({ player, statsChanges }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -20,48 +21,81 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
         </View>
       </View>
       
-      <View style={styles.stats}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-          <Text style={{ fontSize: 14 }}>💰</Text>
-          <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '700', color: '#4CAF50' }}>S${player.stats.wealth}</Text>
+      {player.personalityTraits && player.personalityTraits.length > 0 && (
+        <View style={styles.traitsContainer}>
+          {player.personalityTraits.map(trait => (
+            <View key={trait} style={styles.traitBadge}>
+              <Text style={styles.traitText}>{trait}</Text>
+            </View>
+          ))}
         </View>
-        <StatBar
+      )}
+
+      <View style={styles.stats}>
+        <EnhancedStatBar
+          label="Academic Skill"
+          value={player.stats.academicSkill}
+          color="#3498DB"
+          icon="📚"
+          showChange={statsChanges?.academicSkill}
+        />
+        <EnhancedStatBar
           label="Happiness"
           value={player.stats.happiness}
-          maxValue={100}
-          color="#FF9800"
+          color="#F39C12"
           icon="😊"
+          showChange={statsChanges?.happiness}
         />
-        <StatBar
+        <EnhancedStatBar
           label="Health"
           value={player.stats.health}
-          maxValue={100}
-          color="#E91E63"
+          color="#E74C3C"
           icon="❤️"
+          showChange={statsChanges?.health}
         />
-        <StatBar
+        <EnhancedStatBar
           label="Social Impact"
           value={player.stats.socialImpact}
-          maxValue={100}
-          color="#9C27B0"
+          color="#9B59B6"
           icon="🤝"
+          showChange={statsChanges?.socialImpact}
         />
-        <Text style={styles.sectionTitle}>Skills</Text>
-        <StatBar
-          label="Academic"
-          value={player.stats.academicSkill}
-          maxValue={100}
-          color="#2196F3"
-          icon="📚"
+        <EnhancedStatBar
+          label="Wealth"
+          value={player.stats.wealth}
+          maxValue={10000}
+          color="#27AE60"
+          icon="💰"
+          showChange={statsChanges?.wealth}
         />
-        {player.cca && (
-          <StatBar
-            label={`${player.cca}`}
-            value={player.ccaSkill}
-            maxValue={100}
-            color="#00BCD4"
-            icon="🎯"
+        {player.stats.stress !== undefined && (
+          <EnhancedStatBar
+            label="Stress"
+            value={player.stats.stress}
+            color="#E67E22"
+            icon="😰"
+            showChange={statsChanges?.stress}
           />
+        )}
+        {player.stats.reputation !== undefined && (
+          <EnhancedStatBar
+            label="Reputation"
+            value={player.stats.reputation}
+            color="#1ABC9C"
+            icon="⭐"
+            showChange={statsChanges?.reputation}
+          />
+        )}
+        {player.cca && (
+          <View style={styles.ccaSection}>
+            <Text style={styles.sectionTitle}>CCA: {player.cca}</Text>
+            <EnhancedStatBar
+              label="CCA Skill"
+              value={player.ccaSkill}
+              color="#16A085"
+              icon="🎯"
+            />
+          </View>
         )}
       </View>
 
@@ -121,11 +155,37 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: '#34495E',
+    marginTop: 12,
+    marginBottom: 8,
+    textTransform: 'capitalize'
+  },
+  traitsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 12
+  },
+  traitBadge: {
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 6,
+    marginBottom: 6
+  },
+  traitText: {
+    fontSize: 11,
+    color: '#4A90E2',
+    fontWeight: '600',
+    textTransform: 'capitalize'
+  },
+  ccaSection: {
     marginTop: 8,
-    marginBottom: 4
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#ECF0F1'
   },
   footer: {
     marginTop: 12,
