@@ -14,5 +14,6 @@ export type RootStackParamList = {
   PostSecondarySelection: { gameState: GameState };
   CareerLife: { gameState: GameState };
   LifeSummary: { gameState: GameState };
+  InvestmentPortfolio: { gameState: GameState };
 };
 

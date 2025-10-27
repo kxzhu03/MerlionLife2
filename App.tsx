@@ -26,6 +26,9 @@ import CareerLife from './screens/CareerLife';
 import ProfileScreen from './screens/ProfileScreen';
 import LifeSummary from './screens/LifeSummary';
 
+// Investment
+import InvestmentPortfolio from './screens/InvestmentPortfolio';
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -54,6 +57,9 @@ const App = () => {
         {/* Profile & Summary */}
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="LifeSummary" component={LifeSummary} />
+        
+        {/* Investment */}
+        <Stack.Screen name="InvestmentPortfolio" component={InvestmentPortfolio} />
       </Stack.Navigator>
     </NavigationContainer>
   );
