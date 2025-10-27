@@ -1,4 +1,6 @@
 // Core game types for Merlion-Life
+export * from './avatar';
+export * from './lifestages';
 
 export enum SESClass {
   LOWER = 'lower',
@@ -79,7 +81,58 @@ export enum RandomEvent {
   TEACHER_PRAISE = 'teacher_praise',
   PEER_TUTORING = 'peer_tutoring',
   LOST_FRIEND = 'lost_friend',
-  NEW_HOBBY = 'new_hobby'
+  NEW_HOBBY = 'new_hobby',
+  
+  // Secondary School Events
+  FIRST_CRUSH = 'first_crush',
+  SCHOOL_DANCE = 'school_dance',
+  PART_TIME_JOB = 'part_time_job',
+  OVERSEAS_TRIP = 'overseas_trip',
+  STUDENT_LEADER = 'student_leader',
+  ACADEMIC_PRESSURE = 'academic_pressure',
+  FRIENDSHIP_DRAMA = 'friendship_drama',
+  FIRST_RELATIONSHIP = 'first_relationship',
+  BREAKUP = 'breakup',
+  EXAM_FAILURE = 'exam_failure',
+  SCHOLARSHIP_OFFER = 'scholarship_offer',
+  
+  // Post-Secondary Events
+  ORIENTATION_WEEK = 'orientation_week',
+  INTERNSHIP_OFFER = 'internship_offer',
+  OVERSEAS_EXCHANGE = 'overseas_exchange',
+  STARTUP_IDEA = 'startup_idea',
+  CAREER_FAIR = 'career_fair',
+  
+  // NS Events
+  BMT_GRADUATION = 'bmt_graduation',
+  PROMOTION = 'promotion',
+  OUTFIELD_EXERCISE = 'outfield_exercise',
+  NS_INJURY = 'ns_injury',
+  COMMENDATION = 'commendation',
+  
+  // University Events
+  DEAN_LIST = 'dean_list',
+  RESEARCH_PROJECT = 'research_project',
+  CLUB_PRESIDENT = 'club_president',
+  GRADUATION = 'graduation',
+  
+  // Career Events
+  JOB_OFFER = 'job_offer',
+  JOB_PROMOTION = 'job_promotion',
+  JOB_LOSS = 'job_loss',
+  CAREER_CHANGE = 'career_change',
+  BUSINESS_SUCCESS = 'business_success',
+  BUSINESS_FAILURE = 'business_failure',
+  
+  // Life Events
+  ENGAGEMENT = 'engagement',
+  WEDDING = 'wedding',
+  FIRST_CHILD = 'first_child',
+  BTO_BALLOT = 'bto_ballot',
+  HOUSE_PURCHASE = 'house_purchase',
+  INHERITANCE = 'inheritance',
+  HEALTH_CRISIS = 'health_crisis',
+  WINDFALL = 'windfall'
 }
 
 export enum PersonalityTrait {
@@ -103,7 +156,19 @@ export enum AchievementType {
   PERFECT_BALANCE = 'perfect_balance',
   SURVIVOR = 'survivor',
   POPULAR = 'popular',
-  SCHOLAR = 'scholar'
+  SCHOLAR = 'scholar',
+  
+  // New Achievements
+  MILLIONAIRE = 'millionaire',
+  HOMEOWNER = 'homeowner',
+  FAMILY_PERSON = 'family_person',
+  CAREER_MASTER = 'career_master',
+  ENTREPRENEUR = 'entrepreneur',
+  LIFELONG_LEARNER = 'lifelong_learner',
+  COMMUNITY_LEADER = 'community_leader',
+  HEALTHY_LIVING = 'healthy_living',
+  RELATIONSHIP_EXPERT = 'relationship_expert',
+  COMPLETE_LIFE = 'complete_life'
 }
 
 export enum RelationshipType {
@@ -112,7 +177,12 @@ export enum RelationshipType {
   BEST_FRIEND = 'best_friend',
   RIVAL = 'rival',
   MENTOR = 'mentor',
-  CRUSH = 'crush'
+  CRUSH = 'crush',
+  PARTNER = 'partner',
+  SPOUSE = 'spouse',
+  CHILD = 'child',
+  COLLEAGUE = 'colleague',
+  BUSINESS_PARTNER = 'business_partner'
 }
 
 export interface PlayerStats {
@@ -121,8 +191,10 @@ export interface PlayerStats {
   health: number;
   socialImpact: number;
   academicSkill: number;
-  stress?: number; // New stat
-  reputation?: number; // New stat
+  stress?: number;
+  reputation?: number;
+  workExperience?: number;
+  leadership?: number;
 }
 
 export interface Relationship {
@@ -147,6 +219,7 @@ export interface Player {
   id: string;
   name: string;
   avatar: string;
+  avatarCustomization?: import('./avatar').AvatarCustomization;
   age: number;
   grade: number;
   sesClass: SESClass;
@@ -159,11 +232,21 @@ export interface Player {
   tuitionSubjects: string[];
   currentYear: number;
   psleStream: PSLEStream | null;
-  // New fields
   personalityTraits?: PersonalityTrait[];
   relationships?: Relationship[];
   achievements?: Achievement[];
-  eventHistory?: string[]; // Track events that have occurred
+  eventHistory?: string[];
+  
+  // Life stage data
+  lifeStageProgress?: import('./lifestages').LifeStageProgress;
+  secondarySchoolData?: import('./lifestages').SecondarySchoolData;
+  postSecondaryData?: import('./lifestages').PostSecondaryData;
+  nsData?: import('./lifestages').NSData;
+  universityData?: import('./lifestages').UniversityData;
+  careerData?: import('./lifestages').CareerData;
+  familyData?: import('./lifestages').FamilyData;
+  housingData?: import('./lifestages').HousingData;
+  cpfData?: import('./lifestages').CPFData;
 }
 
 export interface ActivityPoints {
@@ -208,13 +291,15 @@ export interface RandomEventData {
   relationshipEffects?: { type: RelationshipType; change: number }[];
   requiresYear?: number[]; // Only occurs in specific years
   requiresTraits?: PersonalityTrait[]; // Only occurs with certain traits
+  requiresStage?: import('./lifestages').LifeStage;
+  requiresGender?: import('./avatar').Gender;
 }
 
 export interface GameState {
   player: Player;
   currentYear: number;
   isGameComplete: boolean;
-  gamePhase: 'primary' | 'secondary' | 'post_secondary' | 'career' | 'completed';
+  gamePhase: 'primary' | 'secondary' | 'post_secondary' | 'ns' | 'university' | 'career' | 'completed';
   lastRandomEventYear?: number;
   yearlyReports?: YearlyReport[];
 }

@@ -10,6 +10,7 @@ import GameScreen from './screens/GameScreen';
 import YearlyPlanning from './screens/YearlyPlanning';
 import PSLEAssessment from './screens/PSLEAssessment';
 import ProfileScreen from './screens/ProfileScreen';
+import AvatarBuilder from './screens/AvatarBuilder';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -19,6 +20,7 @@ const App = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="CharacterCreation" component={CharacterCreation} />
+        <Stack.Screen name="AvatarBuilder" component={AvatarBuilder} />
         <Stack.Screen name="Game" component={GameScreen} />
         <Stack.Screen name="YearlyPlanning" component={YearlyPlanning} />
         <Stack.Screen name="PSLEAssessment" component={PSLEAssessment} />

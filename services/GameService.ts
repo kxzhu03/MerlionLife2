@@ -31,7 +31,7 @@ export class GameService {
     }
   }
 
-  static createNewPlayer(name: string, avatar: string, sesClass: SESClass, traits: PersonalityTrait[]): Player {
+  static createNewPlayer(name: string, avatar: string, sesClass: SESClass, traits: PersonalityTrait[], avatarCustomization?: import('../types/avatar').AvatarCustomization): Player {
     const sesData = SES_CONFIG[sesClass];
     const dailyAllowance = this.getRandomAllowance(sesData.dailyAllowanceRange);
     
@@ -57,6 +57,7 @@ export class GameService {
       id: Date.now().toString(),
       name,
       avatar,
+      avatarCustomization,
       age: 7,
       grade: 1,
       sesClass,
