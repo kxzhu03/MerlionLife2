@@ -8,4 +8,11 @@ export type RootStackParamList = {
   YearlyPlanning: { gameState: GameState };
   PSLEAssessment: { gameState: GameState };
   Profile: { gameState: GameState };
+  SecondarySchool: { gameState: GameState };
+  SecondaryYearPlanning: { gameState: GameState };
+  OLevelExam: { gameState: GameState };
+  PostSecondarySelection: { gameState: GameState };
+  CareerLife: { gameState: GameState };
+  LifeSummary: { gameState: GameState };
 };
+

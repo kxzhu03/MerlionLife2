@@ -236,6 +236,8 @@ export interface Player {
   relationships?: Relationship[];
   achievements?: Achievement[];
   eventHistory?: string[];
+  examScore?: number;
+  postSecondaryOptions?: import('./lifestages').PostSecondaryPath[];
   
   // Life stage data
   lifeStageProgress?: import('./lifestages').LifeStageProgress;
@@ -299,7 +301,7 @@ export interface GameState {
   player: Player;
   currentYear: number;
   isGameComplete: boolean;
-  gamePhase: 'primary' | 'secondary' | 'post_secondary' | 'ns' | 'university' | 'career' | 'completed';
+  gamePhase: 'primary' | 'secondary' | 'post_secondary' | 'post_secondary_selection' | 'ns' | 'university' | 'career' | 'retirement' | 'completed';
   lastRandomEventYear?: number;
   yearlyReports?: YearlyReport[];
 }

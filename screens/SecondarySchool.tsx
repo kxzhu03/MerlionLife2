@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import { GameState, Player } from '../types';
+import { GameState } from '../types';
 import { SecondaryStream } from '../types/lifestages';
 import PlayerCard from '../components/PlayerCard';
-import { GameService } from '../services/GameService';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'SecondarySchool'>;
 type RouteProps = RouteProp<RootStackParamList, 'SecondarySchool'>;
@@ -17,10 +16,10 @@ interface Props {
 }
 
 const SecondarySchool: React.FC<Props> = ({ navigation, route }) => {
-  const [gameState, setGameState] = useState<GameState>(route.params.gameState);
+  const { gameState } = route.params;
   const { player } = gameState;
   
-  const stream = player.secondarySchoolData?.stream || player.psleStream as any as SecondaryStream;
+  const stream = player.secondarySchoolData?.stream || SecondaryStream.EXPRESS;
   const secondaryYear = player.lifeStageProgress?.stageYear || 1;
 
   const getStreamInfo = () => {
@@ -107,9 +106,9 @@ const SecondarySchool: React.FC<Props> = ({ navigation, route }) => {
           <View style={styles.infoCard}>
             <Text style={styles.infoTitle}>📚 Your Subjects</Text>
             <View style={styles.subjectList}>
-              {player.secondarySchoolData.subjects.map((subject, index) => (
+              {player.secondarySchoolData.subjects.slice(0, 6).map((subject, index) => (
                 <View key={index} style={styles.subjectPill}>
-                  <Text style={styles.subjectText}>{subject}</Text>
+                  <Text style={styles.subjectText}>{subject.replace('_', ' ')}</Text>
                 </View>
               ))}
             </View>
@@ -153,7 +152,7 @@ const SecondarySchool: React.FC<Props> = ({ navigation, route }) => {
         </View>
 
         <TouchableOpacity style={styles.primaryButton} onPress={planYear}>
-          <Text style={styles.primaryButtonText}>Plan This Year</Text>
+          <Text style={styles.primaryButtonText}>Plan This Year →</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -276,7 +275,8 @@ const styles = StyleSheet.create({
   subjectText: {
     fontSize: 13,
     color: '#1976D2',
-    fontWeight: '600'
+    fontWeight: '600',
+    textTransform: 'capitalize'
   },
   ccaPill: {
     backgroundColor: '#F3E5F5',
