@@ -69,6 +69,10 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       return;
     }
 
+    // Track previous CCA BEFORE updating player
+    const previousCCA = player.cca;
+    const ccaChanged = previousCCA !== selectedCCA;
+    
     const updatedPlayer: Player = { 
       ...player, 
       mealChoice, 
@@ -81,8 +85,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     // Calculate yearly stats
     const { statsChange, wealthChange } = GameService.calculateYearlyStats(updatedPlayer, ap, mealChoice);
     let finalPlayer = GameService.updatePlayerStats(updatedPlayer, { ...statsChange, wealth: wealthChange });
-    // Track previous CCA for skill retention
-    const previousCCA = player.cca;
+    
+    // Update CCA skill with retention if changed
     finalPlayer = GameService.updateCCASkill(finalPlayer, ccaPoints, previousCCA);
 
     // Check achievements
