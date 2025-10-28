@@ -274,9 +274,9 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.CAREER, 'InvestmentPortfolio', 30)}
+              onPress={() => skipToPhase(LifeStage.CAREER, 'InvestmentPortfolio', 18)}
             >
-              <Text style={styles.debugButtonText}>📈 Investment Portfolio (Age 30)</Text>
+              <Text style={styles.debugButtonText}>📈 Investment Portfolio (Age 18)</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

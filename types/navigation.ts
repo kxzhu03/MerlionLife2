@@ -1,4 +1,5 @@
 import { Player, GameState } from './index';
+import { ChoiceEvent } from './choiceEvents';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -15,5 +16,10 @@ export type RootStackParamList = {
   CareerLife: { gameState: GameState };
   LifeSummary: { gameState: GameState };
   InvestmentPortfolio: { gameState: GameState };
+  ChoiceEvent: { 
+    gameState: GameState; 
+    event: ChoiceEvent; 
+    returnScreen: keyof RootStackParamList;
+  };
 };
 

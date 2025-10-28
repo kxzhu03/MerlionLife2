@@ -29,6 +29,9 @@ import LifeSummary from './screens/LifeSummary';
 // Investment
 import InvestmentPortfolio from './screens/InvestmentPortfolio';
 
+// Events
+import ChoiceEventScreen from './screens/ChoiceEventScreen';
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -60,6 +63,9 @@ const App = () => {
         
         {/* Investment */}
         <Stack.Screen name="InvestmentPortfolio" component={InvestmentPortfolio} />
+        
+        {/* Events */}
+        <Stack.Screen name="ChoiceEvent" component={ChoiceEventScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types/navigation';
 import { ACTIVITY_POINTS_PER_YEAR, HEALTHY_MEAL_COST, UNHEALTHY_MEAL_COST, SES_CONFIG, CCA_OPTIONS } from '../data/constants';
 import { ActivityPoints, GameState, MealChoice, Player } from '../types';
 import { GameService } from '../services/GameService';
+import { getRandomChoiceEvent } from '../data/choiceEvents';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'YearlyPlanning'>;
 type RouteProps = RouteProp<RootStackParamList, 'YearlyPlanning'>;
@@ -97,6 +98,18 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
     const newState: GameState = { ...gameState, player: advanced, currentYear: advanced.currentYear };
     await GameService.saveGameState(newState);
+
+    // Trigger choice event (50% chance)
+    if (Math.random() > 0.5) {
+      const choiceEvent = getRandomChoiceEvent(advanced.age);
+      const returnScreen = advanced.currentYear > 6 ? 'PSLEAssessment' : 'Game';
+      navigation.navigate('ChoiceEvent', { 
+        gameState: newState, 
+        event: choiceEvent,
+        returnScreen
+      });
+      return;
+    }
 
     // If completed Primary 6 (year 6), go to PSLE
     if (advanced.currentYear > 6) {

@@ -8,6 +8,7 @@ import { SecondarySchoolService } from '../services/SecondarySchoolService';
 import { GameService } from '../services/GameService';
 import { SECONDARY_EVENTS } from '../data/secondaryEvents';
 import { CCA_OPTIONS } from '../data/constants';
+import { getRandomChoiceEvent } from '../data/choiceEvents';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'SecondaryYearPlanning'>;
 type RouteProps = RouteProp<RootStackParamList, 'SecondaryYearPlanning'>;
@@ -133,14 +134,33 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
     // Check if should take major exam or graduate
     const examInfo = SecondarySchoolService.shouldTakeMajorExam(updatedPlayer);
     
+    // Determine return screen based on progression
+    let returnScreen: keyof RootStackParamList;
     if (examInfo.exam) {
-      // Take exam first
+      returnScreen = 'OLevelExam';
+    } else if (examInfo.isGraduating) {
+      returnScreen = 'PostSecondarySelection';
+    } else {
+      returnScreen = 'SecondarySchool';
+    }
+
+    // Trigger choice event (50% chance)
+    if (Math.random() > 0.5) {
+      const choiceEvent = getRandomChoiceEvent(updatedPlayer.age);
+      navigation.navigate('ChoiceEvent', { 
+        gameState: newGameState, 
+        event: choiceEvent,
+        returnScreen
+      });
+      return;
+    }
+    
+    // Navigate to appropriate screen
+    if (examInfo.exam) {
       navigation.navigate('OLevelExam', { gameState: newGameState });
     } else if (examInfo.isGraduating) {
-      // IP students or completed all years - go to post-secondary
       navigation.navigate('PostSecondarySelection', { gameState: newGameState });
     } else {
-      // Continue secondary school
       navigation.navigate('SecondarySchool', { gameState: newGameState });
     }
   };
