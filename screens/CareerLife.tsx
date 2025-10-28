@@ -219,6 +219,13 @@ const CareerLife: React.FC<Props> = ({ navigation, route }) => {
               <Text style={styles.actionButtonText}>⏭️ Work for a Year</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.investmentButton]} 
+              onPress={() => navigation.navigate('InvestmentPortfolio', { gameState })}
+            >
+              <Text style={styles.actionButtonText}>📈 Investment Portfolio</Text>
+            </TouchableOpacity>
+
             {!isMarried && age >= 25 && (
               <TouchableOpacity style={styles.actionButton} onPress={getMarried}>
                 <Text style={styles.actionButtonText}>💍 Get Married</Text>
@@ -366,6 +373,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 14,
     marginBottom: 10
+  },
+  investmentButton: {
+    backgroundColor: '#10B981'
   },
   retireButton: {
     backgroundColor: '#9C27B0'
