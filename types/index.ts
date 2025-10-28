@@ -259,6 +259,9 @@ export interface Player {
   familyData?: import('./lifestages').FamilyData;
   housingData?: import('./lifestages').HousingData;
   cpfData?: import('./lifestages').CPFData;
+  
+  // Investment portfolio
+  portfolio?: import('./assets').Portfolio;
 }
 
 export interface ActivityPoints {
