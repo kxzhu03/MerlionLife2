@@ -28,14 +28,17 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const totalPoints = academics + ccaPoints + volunteering;
   const maxPoints = ACTIVITY_POINTS_PER_YEAR;
-  const canAffordYear = savings >= 0;
-  const canConfirm = totalPoints === maxPoints && selectedCCA !== null && canAffordYear;
 
+  // Calculate budget first
   const yearlyAllowance = player.dailyAllowance * 365;
   const mealCost = (mealChoice === MealChoice.HEALTHY ? HEALTHY_MEAL_COST : UNHEALTHY_MEAL_COST) * 365;
   const tuitionCost = tuitionSubjects.length * 200 * 12;
   const totalCost = mealCost + tuitionCost;
   const savings = yearlyAllowance - totalCost;
+  
+  // Then check if can afford
+  const canAffordYear = savings >= 0;
+  const canConfirm = totalPoints === maxPoints && selectedCCA !== null && canAffordYear;
 
   const maxTuition = SES_CONFIG[player.sesClass].maxTuitionSubjects;
 

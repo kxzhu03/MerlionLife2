@@ -30,14 +30,17 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const totalPoints = academicFocus + ccaFocus + socialFocus;
   const maxPoints = 10;
-  const canAffordYear = savings >= 0;
-  const canConfirm = totalPoints === maxPoints && selectedCCA !== null && canAffordYear;
 
+  // Calculate budget first
   const yearlyAllowance = player.dailyAllowance * 365;
   const mealCost = (mealChoice === MealChoice.HEALTHY ? 5 : 2) * 365;
   const tuitionCost = tuitionSubjects.length * 200 * 12;
   const totalCost = mealCost + tuitionCost;
   const savings = yearlyAllowance - totalCost;
+  
+  // Then check if can afford
+  const canAffordYear = savings >= 0;
+  const canConfirm = totalPoints === maxPoints && selectedCCA !== null && canAffordYear;
 
   const maxTuition = player.sesClass === 'upper' ? 2 : player.sesClass === 'middle' ? 1 : 0;
 
