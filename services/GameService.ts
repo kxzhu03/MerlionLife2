@@ -392,10 +392,10 @@ export class GameService {
     if (previousCCA && previousCCA === player.cca) {
       baseSkill = player.ccaSkill;
     }
-    // If CCA changed (and we had a previous CCA), retain 30% as transferable skills
+    // If CCA changed (and we had a previous CCA), retain 100% of skill
     else if (previousCCA && previousCCA !== player.cca) {
-      baseSkill = Math.floor(player.ccaSkill * 0.3);
-      console.log(`CCA changed from ${previousCCA} to ${player.cca}. Retaining 30%: ${baseSkill}`);
+      baseSkill = player.ccaSkill; // Keep 100% when changing CCA
+      console.log(`CCA changed from ${previousCCA} to ${player.cca}. Retaining 100%: ${baseSkill}`);
     }
     // If this is the first time selecting a CCA (previousCCA is null), start from 0
     else {

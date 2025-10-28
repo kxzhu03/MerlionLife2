@@ -17,6 +17,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
   const [gameState, setGameState] = useState<GameState>(route.params?.gameState);
   const [hasShownEventForYear, setHasShownEventForYear] = useState<boolean>(false);
   const [newAchievements, setNewAchievements] = useState<string[]>([]);
+  const [currentYearTracked, setCurrentYearTracked] = useState<number>(route.params?.gameState?.player.currentYear || 1);
 
   useEffect(() => {
     if (!gameState) {
@@ -26,10 +27,11 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // Reset event gate when year changes
   useEffect(() => {
-    if (gameState) {
+    if (gameState && gameState.player.currentYear !== currentYearTracked) {
+      setCurrentYearTracked(gameState.player.currentYear);
       setHasShownEventForYear(false);
     }
-  }, [gameState?.player.currentYear]);
+  }, [gameState?.player.currentYear, currentYearTracked]);
 
   // Show random event popup at the start of the year
   useEffect(() => {

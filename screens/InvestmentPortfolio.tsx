@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,18 +6,17 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  FlatList,
-  Dimensions,
-  Modal,
-  TextInput
+  TextInput,
+  Modal
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import { GameState, Player } from '../types';
-import { InvestmentService, Investment } from '../services/InvestmentService';
+import { GameState } from '../types';
+import { PortfolioService } from '../services/PortfolioService';
+import { ASSET_MARKET_DATA, LIABILITY_MARKET_DATA } from '../data/marketData';
+import { AssetMarketData, LiabilityMarketData, Asset, Liability } from '../types/assets';
 import { GameService } from '../services/GameService';
-import { Colors, BorderRadius, Spacing, Typography } from '../theme/colors';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'InvestmentPortfolio'>;
 type RouteProps = RouteProp<RootStackParamList, 'InvestmentPortfolio'>;
@@ -27,556 +26,482 @@ interface Props {
   route: RouteProps;
 }
 
-interface InvestmentMarketData {
-  id: string;
-  name: string;
-  symbol: string;
-  type: 'stock' | 'crypto' | 'bond';
-  currentPrice: number;
-  previousPrice: number;
-  riskLevel: 'low' | 'medium' | 'high';
-  volatility: number;
-  description: string;
-  minInvestment: number;
-  expectedReturn: number;
-}
-
-const MARKET_DATA: InvestmentMarketData[] = [
-  // Singapore Blue Chip Stocks
-  {
-    id: 'dbs',
-    name: 'DBS Bank',
-    symbol: 'DBS',
-    type: 'stock',
-    currentPrice: 35.50,
-    previousPrice: 35.20,
-    riskLevel: 'low',
-    volatility: 0.02,
-    description: 'Singapore\'s largest bank. Stable dividend yields.',
-    minInvestment: 1000,
-    expectedReturn: 5
-  },
-  {
-    id: 'ocbc',
-    name: 'OCBC Bank',
-    symbol: 'OCBC',
-    type: 'stock',
-    currentPrice: 12.80,
-    previousPrice: 12.65,
-    riskLevel: 'low',
-    volatility: 0.015,
-    description: 'Established bank with strong fundamentals.',
-    minInvestment: 1000,
-    expectedReturn: 4.5
-  },
-  {
-    id: 'uob',
-    name: 'UOB Bank',
-    symbol: 'UOB',
-    type: 'stock',
-    currentPrice: 28.90,
-    previousPrice: 28.50,
-    riskLevel: 'low',
-    volatility: 0.018,
-    description: 'Major regional bank with growth potential.',
-    minInvestment: 1000,
-    expectedReturn: 5.5
-  },
-  {
-    id: 'singtel',
-    name: 'Singtel',
-    symbol: 'ST',
-    type: 'stock',
-    currentPrice: 3.45,
-    previousPrice: 3.50,
-    riskLevel: 'low',
-    volatility: 0.02,
-    description: 'Singapore\'s largest telecom provider.',
-    minInvestment: 1000,
-    expectedReturn: 4
-  },
-
-  // Growth Stocks
-  {
-    id: 'sea',
-    name: 'Sea Limited',
-    symbol: 'SE',
-    type: 'stock',
-    currentPrice: 85.20,
-    previousPrice: 82.10,
-    riskLevel: 'high',
-    volatility: 0.08,
-    description: 'E-commerce and fintech giant. High growth potential.',
-    minInvestment: 5000,
-    expectedReturn: 15
-  },
-  {
-    id: 'grab',
-    name: 'Grab Holdings',
-    symbol: 'GRAB',
-    type: 'stock',
-    currentPrice: 4.50,
-    previousPrice: 4.35,
-    riskLevel: 'high',
-    volatility: 0.1,
-    description: 'Ride-hailing and delivery platform. Volatile but growing.',
-    minInvestment: 5000,
-    expectedReturn: 20
-  },
-
-  // Cryptocurrencies
-  {
-    id: 'bitcoin',
-    name: 'Bitcoin',
-    symbol: 'BTC',
-    type: 'crypto',
-    currentPrice: 45000,
-    previousPrice: 43000,
-    riskLevel: 'high',
-    volatility: 0.15,
-    description: 'The original cryptocurrency. Highly volatile.',
-    minInvestment: 10000,
-    expectedReturn: 25
-  },
-  {
-    id: 'ethereum',
-    name: 'Ethereum',
-    symbol: 'ETH',
-    type: 'crypto',
-    currentPrice: 2500,
-    previousPrice: 2400,
-    riskLevel: 'high',
-    volatility: 0.18,
-    description: 'Smart contract platform. High volatility.',
-    minInvestment: 5000,
-    expectedReturn: 30
-  },
-
-  // Bonds
-  {
-    id: 'sgb',
-    name: 'Singapore Government Bonds',
-    symbol: 'SGB',
-    type: 'bond',
-    currentPrice: 100,
-    previousPrice: 100,
-    riskLevel: 'low',
-    volatility: 0.005,
-    description: 'Safe investment with guaranteed returns.',
-    minInvestment: 5000,
-    expectedReturn: 2.5
-  },
-  {
-    id: 'corporate_bond',
-    name: 'Corporate Bonds',
-    symbol: 'CORP',
-    type: 'bond',
-    currentPrice: 98.50,
-    previousPrice: 99.00,
-    riskLevel: 'medium',
-    volatility: 0.03,
-    description: 'Higher yield than government bonds.',
-    minInvestment: 5000,
-    expectedReturn: 5
-  }
-];
-
 const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
   const [gameState, setGameState] = useState<GameState>(route.params.gameState);
   const { player } = gameState;
-  const [marketData, setMarketData] = useState<InvestmentMarketData[]>(MARKET_DATA);
-  const [selectedInvestment, setSelectedInvestment] = useState<InvestmentMarketData | null>(null);
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'assets' | 'store'>('portfolio');
   const [showBuyModal, setShowBuyModal] = useState(false);
-  const [buyAmount, setBuyAmount] = useState('');
-  const [activeTab, setActiveTab] = useState<'market' | 'portfolio' | 'insurance'>('market');
+  const [selectedAsset, setSelectedAsset] = useState<AssetMarketData | null>(null);
+  const [selectedLiability, setSelectedLiability] = useState<LiabilityMarketData | null>(null);
+  const [buyQuantity, setBuyQuantity] = useState('1');
 
-  // Simulate market fluctuations
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMarketData(prevData =>
-        prevData.map(investment => {
-          const volatility = investment.volatility;
-          const randomChange = (Math.random() - 0.5) * 2 * volatility;
-          const newPrice = investment.currentPrice * (1 + randomChange);
+  const portfolio = player.portfolio || PortfolioService.initializePortfolio();
+  const availableAssets = PortfolioService.getAvailableAssets(player);
+  const availableLiabilities = PortfolioService.getAvailableLiabilities(player);
 
-          return {
-            ...investment,
-            previousPrice: investment.currentPrice,
-            currentPrice: Math.max(0, newPrice)
-          };
-        })
-      );
-    }, 5000); // Update every 5 seconds
+  const handleBuyAsset = async () => {
+    if (!selectedAsset) return;
 
-    return () => clearInterval(interval);
-  }, []);
-
-  const getPriceChange = (investment: InvestmentMarketData) => {
-    const change = investment.currentPrice - investment.previousPrice;
-    const changePercent = (change / investment.previousPrice) * 100;
-    return { change, changePercent };
-  };
-
-  const getPriceChangeColor = (change: number) => {
-    if (change > 0) return Colors.success.main;
-    if (change < 0) return Colors.error.main;
-    return Colors.neutral.gray500;
-  };
-
-  const handleBuyInvestment = async () => {
-    if (!selectedInvestment || !buyAmount) {
-      Alert.alert('Error', 'Please enter an amount');
+    const quantity = parseFloat(buyQuantity);
+    if (isNaN(quantity) || quantity <= 0) {
+      Alert.alert('Invalid Quantity', 'Please enter a valid number');
       return;
     }
 
-    const amount = parseFloat(buyAmount);
-    const totalCost = amount * selectedInvestment.currentPrice;
-
-    if (totalCost > (player.stats.wealth || 0)) {
-      Alert.alert('Insufficient Funds', `You need $${totalCost.toFixed(2)} but only have $${(player.stats.wealth || 0).toFixed(2)}`);
-      return;
-    }
-
-    if (amount < 1) {
-      Alert.alert('Invalid Amount', 'Please enter a valid quantity');
-      return;
-    }
-
-    const newInvestment: Investment = {
-      id: `${selectedInvestment.id}_${Date.now()}`,
-      name: selectedInvestment.name,
-      type: selectedInvestment.type,
-      initialInvestment: totalCost,
-      currentValue: totalCost,
-      yearsHeld: 0,
-      riskLevel: selectedInvestment.riskLevel,
-      expectedReturn: selectedInvestment.expectedReturn,
-      description: selectedInvestment.description
-    };
-
-    const updatedPlayer = { ...player };
-    updatedPlayer.stats.wealth = (updatedPlayer.stats.wealth || 0) - totalCost;
-
-    if (!updatedPlayer.investments) {
-      updatedPlayer.investments = [];
-    }
-    updatedPlayer.investments.push(newInvestment);
-
-    const newGameState = { ...gameState, player: updatedPlayer };
-    await GameService.saveGameState(newGameState);
-    setGameState(newGameState);
-
-    Alert.alert(
-      'Purchase Successful',
-      `Bought ${amount} units of ${selectedInvestment.name} for $${totalCost.toFixed(2)}`
-    );
-
-    setBuyAmount('');
-    setShowBuyModal(false);
-    setSelectedInvestment(null);
-  };
-
-  const handleSellInvestment = async (investment: Investment) => {
-    const { success, newPlayer, proceeds, message } = InvestmentService.sellInvestment(gameState.player, investment.id);
-
-    if (success) {
-      const newGameState = { ...gameState, player: newPlayer };
+    const result = PortfolioService.buyAsset(player, selectedAsset, quantity);
+    
+    if (result.success && result.updatedPlayer) {
+      const newGameState = { ...gameState, player: result.updatedPlayer };
       await GameService.saveGameState(newGameState);
       setGameState(newGameState);
-      Alert.alert('Sale Successful', message);
+      setShowBuyModal(false);
+      setBuyQuantity('1');
+      setSelectedAsset(null);
+      Alert.alert('Success!', result.message);
     } else {
-      Alert.alert('Error', message);
+      Alert.alert('Purchase Failed', result.message);
     }
   };
 
-  const getPortfolioValue = () => {
-    if (!player.investments) return 0;
-    return player.investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+  const handleBuyLiability = async () => {
+    if (!selectedLiability) return;
+
+    const result = PortfolioService.buyLiability(player, selectedLiability);
+    
+    if (result.success && result.updatedPlayer) {
+      const newGameState = { ...gameState, player: result.updatedPlayer };
+      await GameService.saveGameState(newGameState);
+      setGameState(newGameState);
+      setShowBuyModal(false);
+      setSelectedLiability(null);
+      Alert.alert('Success!', result.message);
+    } else {
+      Alert.alert('Purchase Failed', result.message);
+    }
   };
 
-  const getTotalGainLoss = () => {
-    if (!player.investments) return 0;
-    return player.investments.reduce((sum, inv) => sum + (inv.currentValue - inv.initialInvestment), 0);
+  const handleSellAsset = async (assetId: string) => {
+    Alert.alert(
+      'Sell Asset',
+      'Are you sure you want to sell this asset?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sell',
+          style: 'destructive',
+          onPress: async () => {
+            const result = PortfolioService.sellAsset(player, assetId);
+            if (result.success && result.updatedPlayer) {
+              const newGameState = { ...gameState, player: result.updatedPlayer };
+              await GameService.saveGameState(newGameState);
+              setGameState(newGameState);
+              Alert.alert('Sold!', result.message);
+            } else {
+              Alert.alert('Sale Failed', result.message);
+            }
+          }
+        }
+      ]
+    );
   };
 
-  const renderMarketTab = () => (
-    <FlatList
-      data={marketData}
-      keyExtractor={item => item.id}
-      renderItem={({ item }) => {
-        const { change, changePercent } = getPriceChange(item);
-        const canAfford = (player.stats.wealth || 0) >= item.minInvestment;
+  const renderPortfolioTab = () => (
+    <ScrollView style={styles.tabContent}>
+      {/* Summary Card */}
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryTitle}>Portfolio Summary</Text>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Total Assets:</Text>
+          <Text style={[styles.summaryValue, styles.positive]}>
+            ${portfolio.totalAssetValue.toLocaleString()}
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Total Liabilities:</Text>
+          <Text style={[styles.summaryValue, styles.negative]}>
+            ${portfolio.totalLiabilityValue.toLocaleString()}
+          </Text>
+        </View>
+        <View style={[styles.summaryRow, styles.summaryDivider]}>
+          <Text style={styles.summaryLabelBold}>Net Worth:</Text>
+          <Text style={[styles.summaryValueBold, portfolio.netWorth >= 0 ? styles.positive : styles.negative]}>
+            ${portfolio.netWorth.toLocaleString()}
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Monthly Income:</Text>
+          <Text style={[styles.summaryValue, styles.positive]}>
+            ${portfolio.monthlyIncome.toFixed(2)}
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Monthly Expenses:</Text>
+          <Text style={[styles.summaryValue, styles.negative]}>
+            ${portfolio.monthlyExpenses.toLocaleString()}
+          </Text>
+        </View>
+      </View>
 
-        return (
-          <TouchableOpacity
-            style={[styles.marketCard, !canAfford && styles.marketCardDisabled]}
-            onPress={() => {
-              if (canAfford) {
-                setSelectedInvestment(item);
-                setShowBuyModal(true);
-              } else {
-                Alert.alert('Insufficient Funds', `Minimum investment: $${item.minInvestment}`);
-              }
-            }}
-            disabled={!canAfford}
-          >
-            <View style={styles.marketCardHeader}>
-              <View>
-                <Text style={styles.investmentName}>{item.name}</Text>
-                <Text style={styles.investmentSymbol}>{item.symbol}</Text>
-              </View>
-              <View style={styles.riskBadge}>
-                <Text style={[styles.riskBadgeText, { color: item.riskLevel === 'low' ? Colors.success.main : item.riskLevel === 'medium' ? Colors.warning.main : Colors.error.main }]}>
-                  {item.riskLevel.toUpperCase()}
-                </Text>
+      {/* Assets */}
+      <Text style={styles.sectionTitle}>My Assets ({portfolio.assets.length})</Text>
+      {portfolio.assets.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyEmoji}>📊</Text>
+          <Text style={styles.emptyText}>No assets yet</Text>
+          <Text style={styles.emptySubtext}>Start investing to build wealth!</Text>
+        </View>
+      ) : (
+        portfolio.assets.map((asset) => (
+          <View key={asset.id} style={styles.itemCard}>
+            <View style={styles.itemHeader}>
+              <Text style={styles.itemEmoji}>{ASSET_MARKET_DATA.find(a => a.type === asset.type)?.emoji || '📈'}</Text>
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemName}>{asset.name}</Text>
+                <Text style={styles.itemType}>{asset.type.toUpperCase()} • {asset.quantity} units</Text>
               </View>
             </View>
-
-            <View style={styles.marketCardContent}>
-              <View style={styles.priceSection}>
-                <Text style={styles.price}>${item.currentPrice.toFixed(2)}</Text>
-                <View style={[styles.changeIndicator, { backgroundColor: getPriceChangeColor(change) }]}>
-                  <Text style={styles.changeText}>
-                    {change > 0 ? '+' : ''}{changePercent.toFixed(2)}%
-                  </Text>
-                </View>
+            <View style={styles.itemStats}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Purchase Price:</Text>
+                <Text style={styles.statValue}>${asset.purchasePrice.toLocaleString()}</Text>
               </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Current Value:</Text>
+                <Text style={[styles.statValue, styles.positive]}>${asset.currentValue.toLocaleString()}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Gain/Loss:</Text>
+                <Text style={[styles.statValue, asset.currentValue >= asset.purchasePrice * asset.quantity ? styles.positive : styles.negative]}>
+                  ${(asset.currentValue - asset.purchasePrice * asset.quantity).toLocaleString()}
+                </Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Annual Return:</Text>
+                <Text style={styles.statValue}>{asset.annualReturn}%</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.sellButton}
+              onPress={() => handleSellAsset(asset.id)}
+            >
+              <Text style={styles.sellButtonText}>Sell</Text>
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
 
-              <Text style={styles.description}>{item.description}</Text>
+      {/* Liabilities */}
+      <Text style={styles.sectionTitle}>My Liabilities ({portfolio.liabilities.length})</Text>
+      {portfolio.liabilities.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyEmoji}>💳</Text>
+          <Text style={styles.emptyText}>No liabilities</Text>
+          <Text style={styles.emptySubtext}>You're debt-free!</Text>
+        </View>
+      ) : (
+        portfolio.liabilities.map((liability) => (
+          <View key={liability.id} style={styles.itemCard}>
+            <View style={styles.itemHeader}>
+              <Text style={styles.itemEmoji}>{LIABILITY_MARKET_DATA.find(l => l.type === liability.type)?.emoji || '🏠'}</Text>
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemName}>{liability.name}</Text>
+                <Text style={styles.itemType}>{liability.type.toUpperCase()}</Text>
+              </View>
+            </View>
+            <View style={styles.itemStats}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Purchase Price:</Text>
+                <Text style={styles.statValue}>${liability.purchasePrice.toLocaleString()}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Current Value:</Text>
+                <Text style={styles.statValue}>${liability.currentValue.toLocaleString()}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Loan Remaining:</Text>
+                <Text style={[styles.statValue, styles.negative]}>${liability.loanAmount.toLocaleString()}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Monthly Payment:</Text>
+                <Text style={styles.statValue}>${liability.monthlyInstallment.toLocaleString()}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Months Remaining:</Text>
+                <Text style={styles.statValue}>{liability.remainingMonths}</Text>
+              </View>
+            </View>
+          </View>
+        ))
+      )}
+    </ScrollView>
+  );
 
-              <View style={styles.statsRow}>
-                <View style={styles.stat}>
-                  <Text style={styles.statLabel}>Expected Return</Text>
-                  <Text style={styles.statValue}>{item.expectedReturn}%</Text>
-                </View>
-                <View style={styles.stat}>
-                  <Text style={styles.statLabel}>Min Investment</Text>
-                  <Text style={styles.statValue}>${item.minInvestment}</Text>
-                </View>
-                <View style={styles.stat}>
-                  <Text style={styles.statLabel}>Type</Text>
-                  <Text style={styles.statValue}>{item.type}</Text>
-                </View>
+  const renderAssetsTab = () => (
+    <ScrollView style={styles.tabContent}>
+      <Text style={styles.sectionTitle}>Available Investments</Text>
+      <Text style={styles.sectionSubtitle}>Your wealth: ${(player.stats.wealth || 0).toLocaleString()}</Text>
+      
+      {availableAssets.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyEmoji}>💰</Text>
+          <Text style={styles.emptyText}>No investments available</Text>
+          <Text style={styles.emptySubtext}>Build more wealth to unlock investments!</Text>
+        </View>
+      ) : (
+        availableAssets.map((asset) => (
+          <TouchableOpacity
+            key={asset.id}
+            style={styles.marketCard}
+            onPress={() => {
+              setSelectedAsset(asset);
+              setSelectedLiability(null);
+              setShowBuyModal(true);
+            }}
+          >
+            <View style={styles.marketHeader}>
+              <Text style={styles.marketEmoji}>{asset.emoji}</Text>
+              <View style={styles.marketInfo}>
+                <Text style={styles.marketName}>{asset.name}</Text>
+                <Text style={styles.marketSymbol}>{asset.symbol} • {asset.type.toUpperCase()}</Text>
+              </View>
+            </View>
+            <Text style={styles.marketDescription}>{asset.description}</Text>
+            <View style={styles.marketStats}>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Price</Text>
+                <Text style={styles.marketStatValue}>${asset.currentPrice.toLocaleString()}</Text>
+              </View>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Return</Text>
+                <Text style={[styles.marketStatValue, styles.positive]}>{asset.annualReturn}%</Text>
+              </View>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Risk</Text>
+                <Text style={[
+                  styles.marketStatValue,
+                  asset.riskLevel === 'low' ? styles.positive :
+                  asset.riskLevel === 'medium' ? styles.neutral :
+                  styles.negative
+                ]}>
+                  {asset.riskLevel.toUpperCase()}
+                </Text>
+              </View>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Min</Text>
+                <Text style={styles.marketStatValue}>${asset.minInvestment.toLocaleString()}</Text>
               </View>
             </View>
           </TouchableOpacity>
-        );
-      }}
-      scrollEnabled={false}
-    />
-  );
-
-  const renderPortfolioTab = () => (
-    <View>
-      {player.investments && player.investments.length > 0 ? (
-        <>
-          <View style={styles.portfolioSummary}>
-            <View style={styles.summaryCard}>
-              <Text style={styles.summaryLabel}>Portfolio Value</Text>
-              <Text style={styles.summaryValue}>${getPortfolioValue().toFixed(2)}</Text>
-            </View>
-            <View style={[styles.summaryCard, { backgroundColor: getTotalGainLoss() >= 0 ? Colors.success.bg : Colors.error.bg }]}>
-              <Text style={styles.summaryLabel}>Total Gain/Loss</Text>
-              <Text style={[styles.summaryValue, { color: getTotalGainLoss() >= 0 ? Colors.success.main : Colors.error.main }]}>
-                {getTotalGainLoss() >= 0 ? '+' : ''}${getTotalGainLoss().toFixed(2)}
-              </Text>
-            </View>
-          </View>
-
-          <FlatList
-            data={player.investments}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => {
-              const gainLoss = item.currentValue - item.initialInvestment;
-              const gainLossPercent = (gainLoss / item.initialInvestment) * 100;
-
-              return (
-                <View style={styles.investmentCard}>
-                  <View style={styles.investmentHeader}>
-                    <View>
-                      <Text style={styles.investmentName}>{item.name}</Text>
-                      <Text style={styles.investmentMeta}>{item.type} • {item.yearsHeld} years</Text>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.sellButton}
-                      onPress={() => handleSellInvestment(item)}
-                    >
-                      <Text style={styles.sellButtonText}>Sell</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.investmentDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Initial</Text>
-                      <Text style={styles.detailValue}>${item.initialInvestment.toFixed(2)}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Current Value</Text>
-                      <Text style={styles.detailValue}>${item.currentValue.toFixed(2)}</Text>
-                    </View>
-                    <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: Colors.neutral.gray200, paddingTop: Spacing.sm, marginTop: Spacing.sm }]}>
-                      <Text style={styles.detailLabel}>Gain/Loss</Text>
-                      <Text style={[styles.detailValue, { color: gainLoss >= 0 ? Colors.success.main : Colors.error.main }]}>
-                        {gainLoss >= 0 ? '+' : ''}${gainLoss.toFixed(2)} ({gainLossPercent.toFixed(2)}%)
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              );
-            }}
-            scrollEnabled={false}
-          />
-        </>
-      ) : (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyStateEmoji}>📈</Text>
-          <Text style={styles.emptyStateTitle}>No Investments Yet</Text>
-          <Text style={styles.emptyStateText}>Start investing in the Market tab to build your portfolio</Text>
-        </View>
+        ))
       )}
-    </View>
+    </ScrollView>
   );
 
-  const renderInsuranceTab = () => (
-    <View>
-      <View style={styles.insuranceInfo}>
-        <Text style={styles.insuranceTitle}>Insurance Plans</Text>
-        <Text style={styles.insuranceSubtitle}>Protect your wealth and health</Text>
-      </View>
-
-      <View style={styles.insuranceCard}>
-        <View style={styles.insuranceHeader}>
-          <Text style={styles.insurancePlanName}>Health Insurance</Text>
-          <Text style={styles.insurancePlanPrice}>$50/month</Text>
+  const renderStoreTab = () => (
+    <ScrollView style={styles.tabContent}>
+      <Text style={styles.sectionTitle}>Store - Property & Cars</Text>
+      <Text style={styles.sectionSubtitle}>Your wealth: ${(player.stats.wealth || 0).toLocaleString()}</Text>
+      <Text style={styles.warningText}>⚠️ These items require monthly installments!</Text>
+      
+      {availableLiabilities.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyEmoji}>🏪</Text>
+          <Text style={styles.emptyText}>No items available</Text>
+          <Text style={styles.emptySubtext}>Build more wealth to unlock purchases!</Text>
         </View>
-        <Text style={styles.insuranceDescription}>
-          Covers medical expenses up to $100,000 annually. 80% reimbursement rate.
-        </Text>
-        <TouchableOpacity style={styles.insuranceButton}>
-          <Text style={styles.insuranceButtonText}>Purchase</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.insuranceCard}>
-        <View style={styles.insuranceHeader}>
-          <Text style={styles.insurancePlanName}>Life Insurance</Text>
-          <Text style={styles.insurancePlanPrice}>$30/month</Text>
-        </View>
-        <Text style={styles.insuranceDescription}>
-          $500,000 coverage for your family. Protects your loved ones.
-        </Text>
-        <TouchableOpacity style={styles.insuranceButton}>
-          <Text style={styles.insuranceButtonText}>Purchase</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.insuranceCard}>
-        <View style={styles.insuranceHeader}>
-          <Text style={styles.insurancePlanName}>Property Insurance</Text>
-          <Text style={styles.insurancePlanPrice}>$40/month</Text>
-        </View>
-        <Text style={styles.insuranceDescription}>
-          Covers your HDB/property against damage and theft.
-        </Text>
-        <TouchableOpacity style={styles.insuranceButton}>
-          <Text style={styles.insuranceButtonText}>Purchase</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.insuranceCard}>
-        <View style={styles.insuranceHeader}>
-          <Text style={styles.insurancePlanName}>Car Insurance</Text>
-          <Text style={styles.insurancePlanPrice}>$60/month</Text>
-        </View>
-        <Text style={styles.insuranceDescription}>
-          Comprehensive coverage for your vehicle. Third-party and own damage.
-        </Text>
-        <TouchableOpacity style={styles.insuranceButton}>
-          <Text style={styles.insuranceButtonText}>Purchase</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      ) : (
+        availableLiabilities.map((liability) => (
+          <TouchableOpacity
+            key={liability.id}
+            style={styles.marketCard}
+            onPress={() => {
+              setSelectedLiability(liability);
+              setSelectedAsset(null);
+              setShowBuyModal(true);
+            }}
+          >
+            <View style={styles.marketHeader}>
+              <Text style={styles.marketEmoji}>{liability.emoji}</Text>
+              <View style={styles.marketInfo}>
+                <Text style={styles.marketName}>{liability.name}</Text>
+                <Text style={styles.marketSymbol}>{liability.type.toUpperCase()}</Text>
+              </View>
+            </View>
+            <Text style={styles.marketDescription}>{liability.description}</Text>
+            <View style={styles.marketStats}>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Price</Text>
+                <Text style={styles.marketStatValue}>${liability.price.toLocaleString()}</Text>
+              </View>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Down Payment</Text>
+                <Text style={styles.marketStatValue}>{liability.downPayment}%</Text>
+              </View>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Monthly</Text>
+                <Text style={[styles.marketStatValue, styles.negative]}>${liability.monthlyInstallment.toLocaleString()}</Text>
+              </View>
+              <View style={styles.marketStatItem}>
+                <Text style={styles.marketStatLabel}>Interest</Text>
+                <Text style={styles.marketStatValue}>{liability.interestRate}%</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
+    </ScrollView>
   );
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>💰 Investment Portfolio</Text>
-        <Text style={styles.headerSubtitle}>Available: ${(player.stats.wealth || 0).toFixed(2)}</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Investment Portfolio</Text>
+        <View style={styles.headerRight} />
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'market' && styles.tabActive]}
-          onPress={() => setActiveTab('market')}
-        >
-          <Text style={[styles.tabText, activeTab === 'market' && styles.tabTextActive]}>Market</Text>
-        </TouchableOpacity>
+      <View style={styles.tabs}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'portfolio' && styles.tabActive]}
           onPress={() => setActiveTab('portfolio')}
         >
           <Text style={[styles.tabText, activeTab === 'portfolio' && styles.tabTextActive]}>
-            Portfolio {player.investments && player.investments.length > 0 ? `(${player.investments.length})` : ''}
+            Portfolio
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'insurance' && styles.tabActive]}
-          onPress={() => setActiveTab('insurance')}
+          style={[styles.tab, activeTab === 'assets' && styles.tabActive]}
+          onPress={() => setActiveTab('assets')}
         >
-          <Text style={[styles.tabText, activeTab === 'insurance' && styles.tabTextActive]}>Insurance</Text>
+          <Text style={[styles.tabText, activeTab === 'assets' && styles.tabTextActive]}>
+            Invest
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'store' && styles.tabActive]}
+          onPress={() => setActiveTab('store')}
+        >
+          <Text style={[styles.tabText, activeTab === 'store' && styles.tabTextActive]}>
+            Store
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Content */}
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        {activeTab === 'market' && renderMarketTab()}
-        {activeTab === 'portfolio' && renderPortfolioTab()}
-        {activeTab === 'insurance' && renderInsuranceTab()}
-      </ScrollView>
+      {activeTab === 'portfolio' && renderPortfolioTab()}
+      {activeTab === 'assets' && renderAssetsTab()}
+      {activeTab === 'store' && renderStoreTab()}
 
       {/* Buy Modal */}
-      <Modal visible={showBuyModal} transparent animationType="slide">
+      <Modal
+        visible={showBuyModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowBuyModal(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Buy {selectedInvestment?.name}</Text>
-              <TouchableOpacity onPress={() => setShowBuyModal(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
+            {selectedAsset ? (
+              <>
+                <Text style={styles.modalTitle}>Buy {selectedAsset.name}</Text>
+                <Text style={styles.modalEmoji}>{selectedAsset.emoji}</Text>
+                <Text style={styles.modalDescription}>{selectedAsset.description}</Text>
+                
+                <View style={styles.modalStats}>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Price per unit:</Text>
+                    <Text style={styles.modalStatValue}>${selectedAsset.currentPrice.toLocaleString()}</Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Annual return:</Text>
+                    <Text style={[styles.modalStatValue, styles.positive]}>{selectedAsset.annualReturn}%</Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Minimum investment:</Text>
+                    <Text style={styles.modalStatValue}>${selectedAsset.minInvestment.toLocaleString()}</Text>
+                  </View>
+                </View>
 
-            <View style={styles.modalBody}>
-              <View style={styles.modalInfo}>
-                <Text style={styles.modalLabel}>Current Price</Text>
-                <Text style={styles.modalPrice}>${selectedInvestment?.currentPrice.toFixed(2)}</Text>
-              </View>
-
-              <TextInput
-                style={styles.quantityInput}
-                placeholder="Enter quantity"
-                keyboardType="decimal-pad"
-                value={buyAmount}
-                onChangeText={setBuyAmount}
-              />
-
-              <View style={styles.totalCost}>
-                <Text style={styles.totalCostLabel}>Total Cost</Text>
-                <Text style={styles.totalCostValue}>
-                  ${(parseFloat(buyAmount || '0') * (selectedInvestment?.currentPrice || 0)).toFixed(2)}
+                <Text style={styles.inputLabel}>Quantity:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={buyQuantity}
+                  onChangeText={setBuyQuantity}
+                  keyboardType="numeric"
+                  placeholder="Enter quantity"
+                />
+                <Text style={styles.totalCost}>
+                  Total: ${(parseFloat(buyQuantity || '0') * selectedAsset.currentPrice).toLocaleString()}
                 </Text>
-              </View>
 
-              <TouchableOpacity style={styles.buyButton} onPress={handleBuyInvestment}>
-                <Text style={styles.buyButtonText}>Confirm Purchase</Text>
-              </TouchableOpacity>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonCancel]}
+                    onPress={() => setShowBuyModal(false)}
+                  >
+                    <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonConfirm]}
+                    onPress={handleBuyAsset}
+                  >
+                    <Text style={styles.modalButtonTextConfirm}>Buy</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : selectedLiability ? (
+              <>
+                <Text style={styles.modalTitle}>Buy {selectedLiability.name}</Text>
+                <Text style={styles.modalEmoji}>{selectedLiability.emoji}</Text>
+                <Text style={styles.modalDescription}>{selectedLiability.description}</Text>
+                
+                <View style={styles.modalStats}>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Price:</Text>
+                    <Text style={styles.modalStatValue}>${selectedLiability.price.toLocaleString()}</Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Down payment ({selectedLiability.downPayment}%):</Text>
+                    <Text style={[styles.modalStatValue, styles.negative]}>
+                      ${((selectedLiability.price * selectedLiability.downPayment) / 100).toLocaleString()}
+                    </Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Monthly installment:</Text>
+                    <Text style={[styles.modalStatValue, styles.negative]}>
+                      ${selectedLiability.monthlyInstallment.toLocaleString()}
+                    </Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Loan tenure:</Text>
+                    <Text style={styles.modalStatValue}>{selectedLiability.loanTenure} months</Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Interest rate:</Text>
+                    <Text style={styles.modalStatValue}>{selectedLiability.interestRate}%</Text>
+                  </View>
+                </View>
 
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setShowBuyModal(false)}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonCancel]}
+                    onPress={() => setShowBuyModal(false)}
+                  >
+                    <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonConfirm]}
+                    onPress={handleBuyLiability}
+                  >
+                    <Text style={styles.modalButtonTextConfirm}>Buy</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : null}
           </View>
         </View>
       </Modal>
@@ -587,391 +512,365 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.primary
+    backgroundColor: '#F0F4F8',
   },
   header: {
-    paddingTop: 40,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
-    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.neutral.gray200
+    borderBottomColor: '#E2E8F0',
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#4A90E2',
+    fontWeight: '600',
   },
   headerTitle: {
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.xs
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1A202C',
   },
-  headerSubtitle: {
-    fontSize: Typography.fontSize.md,
-    color: Colors.text.secondary
+  headerRight: {
+    width: 50,
   },
-  tabContainer: {
+  tabs: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.neutral.gray200
+    borderBottomColor: '#E2E8F0',
   },
   tab: {
     flex: 1,
-    paddingVertical: Spacing.md,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent'
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: Colors.primary.main
+    borderBottomColor: '#4A90E2',
   },
   tabText: {
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.semibold,
-    color: Colors.text.secondary
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#718096',
   },
   tabTextActive: {
-    color: Colors.primary.main
+    color: '#4A90E2',
   },
-  content: {
-    flex: 1
+  tabContent: {
+    flex: 1,
+    padding: 16,
   },
-  contentContainer: {
-    padding: Spacing.lg,
-    paddingBottom: Spacing.xl
-  },
-  marketCard: {
-    backgroundColor: '#fff',
-    borderRadius: BorderRadius.medium,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.neutral.gray200,
+  summaryCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    shadowRadius: 8,
+    elevation: 3,
   },
-  marketCardDisabled: {
-    opacity: 0.5
+  summaryTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 16,
   },
-  marketCardHeader: {
+  summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md
+    paddingVertical: 8,
   },
-  investmentName: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
-  },
-  investmentSymbol: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary,
-    marginTop: Spacing.xs
-  },
-  riskBadge: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.round,
-    backgroundColor: Colors.background.primary
-  },
-  riskBadgeText: {
-    fontSize: Typography.fontSize.xs,
-    fontWeight: Typography.fontWeight.bold
-  },
-  marketCardContent: {
-    gap: Spacing.md
-  },
-  priceSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  price: {
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
-  },
-  changeIndicator: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.medium
-  },
-  changeText: {
-    color: '#fff',
-    fontWeight: Typography.fontWeight.bold,
-    fontSize: Typography.fontSize.sm
-  },
-  description: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary,
-    lineHeight: 18
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: Spacing.sm
-  },
-  stat: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.small
-  },
-  statLabel: {
-    fontSize: Typography.fontSize.xs,
-    color: Colors.text.secondary,
-    marginBottom: 2
-  },
-  statValue: {
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
-  },
-  portfolioSummary: {
-    flexDirection: 'row',
-    gap: Spacing.lg,
-    marginBottom: Spacing.lg
-  },
-  summaryCard: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: BorderRadius.medium,
-    padding: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.neutral.gray200
+  summaryDivider: {
+    borderTopWidth: 2,
+    borderTopColor: '#E2E8F0',
+    marginTop: 8,
+    paddingTop: 16,
   },
   summaryLabel: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary,
-    marginBottom: Spacing.xs
+    fontSize: 14,
+    color: '#718096',
+  },
+  summaryLabelBold: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A202C',
   },
   summaryValue: {
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
+    fontSize: 14,
+    fontWeight: '600',
   },
-  investmentCard: {
-    backgroundColor: '#fff',
-    borderRadius: BorderRadius.medium,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.neutral.gray200
+  summaryValueBold: {
+    fontSize: 18,
+    fontWeight: '700',
   },
-  investmentHeader: {
+  positive: {
+    color: '#48BB78',
+  },
+  negative: {
+    color: '#F56565',
+  },
+  neutral: {
+    color: '#ED8936',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 12,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#718096',
+    marginBottom: 16,
+  },
+  warningText: {
+    fontSize: 14,
+    color: '#ED8936',
+    marginBottom: 16,
+    fontWeight: '600',
+  },
+  emptyCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  emptyEmoji: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A202C',
+    marginBottom: 4,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  itemCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  itemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  itemEmoji: {
+    fontSize: 32,
+    marginRight: 12,
+  },
+  itemInfo: {
+    flex: 1,
+  },
+  itemName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 2,
+  },
+  itemType: {
+    fontSize: 12,
+    color: '#718096',
+  },
+  itemStats: {
+    marginTop: 8,
+  },
+  statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md
+    paddingVertical: 4,
   },
-  investmentMeta: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary,
-    marginTop: Spacing.xs
+  statLabel: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  statValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A202C',
   },
   sellButton: {
-    backgroundColor: Colors.error.main,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.medium
+    marginTop: 12,
+    backgroundColor: '#F56565',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   sellButtonText: {
-    color: '#fff',
-    fontWeight: Typography.fontWeight.bold,
-    fontSize: Typography.fontSize.sm
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
-  investmentDetails: {
-    gap: Spacing.sm
+  marketCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  detailRow: {
+  marketHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  detailLabel: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary
-  },
-  detailValue: {
-    fontSize: Typography.fontSize.sm,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
-  },
-  emptyState: {
     alignItems: 'center',
-    paddingVertical: Spacing.xl * 2
+    marginBottom: 12,
   },
-  emptyStateEmoji: {
-    fontSize: 48,
-    marginBottom: Spacing.lg
+  marketEmoji: {
+    fontSize: 40,
+    marginRight: 12,
   },
-  emptyStateTitle: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.sm
+  marketInfo: {
+    flex: 1,
   },
-  emptyStateText: {
-    fontSize: Typography.fontSize.md,
-    color: Colors.text.secondary,
-    textAlign: 'center'
+  marketName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 2,
   },
-  insuranceInfo: {
-    marginBottom: Spacing.lg
+  marketSymbol: {
+    fontSize: 12,
+    color: '#718096',
   },
-  insuranceTitle: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.xs
+  marketDescription: {
+    fontSize: 14,
+    color: '#4A5568',
+    marginBottom: 12,
+    lineHeight: 20,
   },
-  insuranceSubtitle: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary
-  },
-  insuranceCard: {
-    backgroundColor: '#fff',
-    borderRadius: BorderRadius.medium,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.neutral.gray200
-  },
-  insuranceHeader: {
+  marketStats: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  marketStatItem: {
     alignItems: 'center',
-    marginBottom: Spacing.md
   },
-  insurancePlanName: {
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
+  marketStatLabel: {
+    fontSize: 12,
+    color: '#718096',
+    marginBottom: 4,
   },
-  insurancePlanPrice: {
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.success.main
-  },
-  insuranceDescription: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary,
-    marginBottom: Spacing.md,
-    lineHeight: 18
-  },
-  insuranceButton: {
-    backgroundColor: Colors.primary.main,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.medium,
-    alignItems: 'center'
-  },
-  insuranceButtonText: {
-    color: '#fff',
-    fontWeight: Typography.fontWeight.bold,
-    fontSize: Typography.fontSize.md
+  marketStatValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1A202C',
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end'
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: BorderRadius.large,
-    borderTopRightRadius: BorderRadius.large,
-    paddingBottom: 40
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.neutral.gray200
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
   },
   modalTitle: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  modalClose: {
-    fontSize: Typography.fontSize.xl,
-    color: Colors.text.secondary
+  modalEmoji: {
+    fontSize: 48,
+    textAlign: 'center',
+    marginBottom: 12,
   },
-  modalBody: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    gap: Spacing.lg
+  modalDescription: {
+    fontSize: 14,
+    color: '#4A5568',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 20,
   },
-  modalInfo: {
-    backgroundColor: Colors.background.primary,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.medium
+  modalStats: {
+    marginBottom: 16,
   },
-  modalLabel: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.text.secondary,
-    marginBottom: Spacing.xs
-  },
-  modalPrice: {
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
-  },
-  quantityInput: {
-    borderWidth: 1,
-    borderColor: Colors.neutral.gray300,
-    borderRadius: BorderRadius.medium,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    fontSize: Typography.fontSize.md,
-    color: Colors.text.primary
-  },
-  totalCost: {
+  modalStatRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingVertical: 6,
+  },
+  modalStatLabel: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  modalStatValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A202C',
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A202C',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  totalCost: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#4A90E2',
+    textAlign: 'right',
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
     alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    backgroundColor: Colors.background.primary,
-    borderRadius: BorderRadius.medium
   },
-  totalCostLabel: {
-    fontSize: Typography.fontSize.md,
-    color: Colors.text.secondary
+  modalButtonCancel: {
+    backgroundColor: '#E2E8F0',
   },
-  totalCostValue: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.text.primary
+  modalButtonConfirm: {
+    backgroundColor: '#4A90E2',
   },
-  buyButton: {
-    backgroundColor: Colors.success.main,
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.medium,
-    alignItems: 'center'
+  modalButtonTextCancel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#4A5568',
   },
-  buyButtonText: {
-    color: '#fff',
-    fontWeight: Typography.fontWeight.bold,
-    fontSize: Typography.fontSize.md
+  modalButtonTextConfirm: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
-  cancelButton: {
-    backgroundColor: Colors.neutral.gray200,
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.medium,
-    alignItems: 'center'
-  },
-  cancelButtonText: {
-    color: Colors.text.primary,
-    fontWeight: Typography.fontWeight.bold,
-    fontSize: Typography.fontSize.md
-  }
 });
 
 export default InvestmentPortfolio;
-
