@@ -7,6 +7,7 @@ import { GameState, Player, MealChoice } from '../types';
 import { SecondarySchoolService } from '../services/SecondarySchoolService';
 import { GameService } from '../services/GameService';
 import { SECONDARY_EVENTS } from '../data/secondaryEvents';
+import { CCA_OPTIONS } from '../data/constants';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'SecondaryYearPlanning'>;
 type RouteProps = RouteProp<RootStackParamList, 'SecondaryYearPlanning'>;
@@ -25,10 +26,12 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
   const [socialFocus, setSocialFocus] = useState(2);
   const [mealChoice, setMealChoice] = useState<MealChoice>(MealChoice.HEALTHY);
   const [tuitionSubjects, setTuitionSubjects] = useState<string[]>([]);
+  const [selectedCCA, setSelectedCCA] = useState<string | null>(player.cca || null);
 
   const totalPoints = academicFocus + ccaFocus + socialFocus;
   const maxPoints = 10;
-  const canConfirm = totalPoints === maxPoints;
+  const canAffordYear = savings >= 0;
+  const canConfirm = totalPoints === maxPoints && selectedCCA !== null && canAffordYear;
 
   const yearlyAllowance = player.dailyAllowance * 365;
   const mealCost = (mealChoice === MealChoice.HEALTHY ? 5 : 2) * 365;
@@ -57,7 +60,13 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const confirmYear = async () => {
     if (!canConfirm) {
-      Alert.alert('Incomplete', 'Please allocate all 10 activity points');
+      if (!canAffordYear) {
+        Alert.alert('Insufficient Funds', `You cannot afford this year's expenses. You need at least $${Math.abs(savings)} more.`);
+      } else if (!selectedCCA) {
+        Alert.alert('No CCA Selected', 'Please select a CCA to continue');
+      } else {
+        Alert.alert('Incomplete', 'Please allocate all 10 activity points');
+      }
       return;
     }
 
@@ -71,15 +80,20 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
 
     // Update player stats
     let updatedPlayer = GameService.updatePlayerStats(player, statChanges);
+    const previousCCA = player.cca;
     updatedPlayer = {
       ...updatedPlayer,
       mealChoice,
       tuitionSubjects,
+      cca: selectedCCA as any,
       stats: {
         ...updatedPlayer.stats,
         wealth: (updatedPlayer.stats.wealth || 0) + savings
       }
     };
+    
+    // Update CCA skill with retention if CCA changed
+    updatedPlayer = GameService.updateCCASkill(updatedPlayer, ccaFocus, previousCCA);
 
     // Trigger random event
     const stageYear = player.lifeStageProgress?.stageYear || 1;
@@ -113,12 +127,17 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
 
     await GameService.saveGameState(newGameState);
 
-    // Check if should take major exam
+    // Check if should take major exam or graduate
     const examInfo = SecondarySchoolService.shouldTakeMajorExam(updatedPlayer);
     
     if (examInfo.exam) {
+      // Take exam first
       navigation.navigate('OLevelExam', { gameState: newGameState });
+    } else if (examInfo.isGraduating) {
+      // IP students or completed all years - go to post-secondary
+      navigation.navigate('PostSecondarySelection', { gameState: newGameState });
     } else {
+      // Continue secondary school
       navigation.navigate('SecondarySchool', { gameState: newGameState });
     }
   };
@@ -206,6 +225,30 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
+
+        {/* CCA Selection */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Your CCA</Text>
+          <Text style={styles.cardSubtitle}>Continue or change your co-curricular activity</Text>
+          <View style={styles.ccaGrid}>
+            {CCA_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option.id}
+                style={[
+                  styles.ccaOption,
+                  selectedCCA === option.id && styles.ccaOptionSelected
+                ]}
+                onPress={() => setSelectedCCA(option.id)}
+              >
+                <Text style={styles.ccaEmoji}>{option.emoji}</Text>
+                <Text style={styles.ccaLabel}>{option.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {player.cca && selectedCCA !== player.cca && (
+            <Text style={styles.ccaWarning}>⚠️ Changing CCA will retain only 30% of your current skill</Text>
+          )}
         </View>
 
         {/* Meal Choice */}
@@ -489,6 +532,42 @@ const styles = StyleSheet.create({
   budgetTotalValue: {
     fontSize: 16,
     fontWeight: '700'
+  },
+  ccaGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8
+  },
+  ccaOption: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E0E0E0'
+  },
+  ccaOptionSelected: {
+    borderColor: '#4A90E2',
+    backgroundColor: '#E3F2FD'
+  },
+  ccaEmoji: {
+    fontSize: 28,
+    marginBottom: 6
+  },
+  ccaLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#2C3E50',
+    textAlign: 'center'
+  },
+  ccaWarning: {
+    fontSize: 12,
+    color: '#FF9800',
+    marginTop: 12,
+    textAlign: 'center',
+    fontWeight: '600'
   },
   confirmButton: {
     backgroundColor: '#4A90E2',

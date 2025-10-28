@@ -383,10 +383,16 @@ export class GameService {
     };
   }
 
-  static updateCCASkill(player: Player, ccaPoints: number): Player {
+  static updateCCASkill(player: Player, ccaPoints: number, previousCCA?: CCAOption | null): Player {
     if (!player.cca) return player;
 
-    const newCCASkill = Math.min(100, player.ccaSkill + ccaPoints);
+    // If CCA changed, retain 30% of previous skill as transferable skills
+    let baseSkill = player.ccaSkill;
+    if (previousCCA && previousCCA !== player.cca) {
+      baseSkill = Math.floor(player.ccaSkill * 0.3);
+    }
+
+    const newCCASkill = Math.min(100, baseSkill + ccaPoints);
     return {
       ...player,
       ccaSkill: newCCASkill

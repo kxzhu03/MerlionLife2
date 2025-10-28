@@ -28,7 +28,8 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const totalPoints = academics + ccaPoints + volunteering;
   const maxPoints = ACTIVITY_POINTS_PER_YEAR;
-  const canConfirm = totalPoints === maxPoints && selectedCCA !== null;
+  const canAffordYear = savings >= 0;
+  const canConfirm = totalPoints === maxPoints && selectedCCA !== null && canAffordYear;
 
   const yearlyAllowance = player.dailyAllowance * 365;
   const mealCost = (mealChoice === MealChoice.HEALTHY ? HEALTHY_MEAL_COST : UNHEALTHY_MEAL_COST) * 365;
@@ -57,7 +58,11 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
 
   const confirmYear = async () => {
     if (!canConfirm) {
-      Alert.alert('Incomplete', 'Please allocate all 10 activity points and select a CCA');
+      if (!canAffordYear) {
+        Alert.alert('Insufficient Funds', `You cannot afford this year's expenses. You need at least $${Math.abs(savings)} more.`);
+      } else {
+        Alert.alert('Incomplete', 'Please allocate all 10 activity points and select a CCA');
+      }
       return;
     }
 
@@ -73,7 +78,9 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     // Calculate yearly stats
     const { statsChange, wealthChange } = GameService.calculateYearlyStats(updatedPlayer, ap, mealChoice);
     let finalPlayer = GameService.updatePlayerStats(updatedPlayer, { ...statsChange, wealth: wealthChange });
-    finalPlayer = GameService.updateCCASkill(finalPlayer, ccaPoints);
+    // Track previous CCA for skill retention
+    const previousCCA = player.cca;
+    finalPlayer = GameService.updateCCASkill(finalPlayer, ccaPoints, previousCCA);
 
     // Check achievements
     finalPlayer = GameService.checkAchievements(finalPlayer);
@@ -293,7 +300,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
           disabled={!canConfirm}
         >
           <Text style={styles.confirmButtonText}>
-            {canConfirm ? 'Confirm Year Plan' : 'Complete All Selections First'}
+            {!canAffordYear ? 'Insufficient Funds' : canConfirm ? 'Confirm Year Plan' : 'Complete All Selections First'}
           </Text>
         </TouchableOpacity>
       </ScrollView>
