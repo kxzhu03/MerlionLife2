@@ -96,6 +96,7 @@ export enum RandomEvent {
   EXAM_FAILURE = 'exam_failure',
   SCHOLARSHIP_OFFER = 'scholarship_offer',
   CCA_TRIALS = 'cca_trials',
+  ENRICHMENT_PROGRAM = 'enrichment_program',
   SPORTS_SCHOLARSHIP = 'sports_scholarship',
   ARTS_SCHOLARSHIP = 'arts_scholarship',
   STEM_SCHOLARSHIP = 'stem_scholarship',

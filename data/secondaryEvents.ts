@@ -460,12 +460,7 @@ export const SECONDARY_EVENTS: RandomEventData[] = [
     probability: 0.22,
     requiresYear: [2, 3, 4],
     requiresStage: LifeStage.SECONDARY_SCHOOL
-  }
-];
-
-// Export event count for reference
-export const SECONDARY_EVENTS_COUNT = SECONDARY_EVENTS.length;
-
+  },
 
   // Special CCA Talent Programs and Scholarships
   {
@@ -561,3 +556,6 @@ export const SECONDARY_EVENTS_COUNT = SECONDARY_EVENTS.length;
     requiresCCASkill: 65
   }
 ];
+
+// Export event count for reference
+export const SECONDARY_EVENTS_COUNT = SECONDARY_EVENTS.length;
