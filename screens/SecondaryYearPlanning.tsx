@@ -92,7 +92,9 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
 
     if (availableEvents.length > 0) {
       const randomEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
-      updatedPlayer = GameService.applyEvent(updatedPlayer, randomEvent);
+      const eventChanges = GameService.getRandomEventEffects(randomEvent.id);
+      updatedPlayer = GameService.updatePlayerStats(updatedPlayer, eventChanges);
+      updatedPlayer = GameService.updateRelationships(updatedPlayer, randomEvent.id);
       updatedPlayer.eventHistory = [...(updatedPlayer.eventHistory || []), randomEvent.id];
     }
 
