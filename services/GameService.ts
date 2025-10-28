@@ -386,13 +386,25 @@ export class GameService {
   static updateCCASkill(player: Player, ccaPoints: number, previousCCA?: CCAOption | null): Player {
     if (!player.cca) return player;
 
-    // If CCA changed, retain 30% of previous skill as transferable skills
-    let baseSkill = player.ccaSkill;
-    if (previousCCA && previousCCA !== player.cca) {
+    let baseSkill = 0;
+    
+    // If this is the same CCA as before, keep accumulating skill
+    if (previousCCA && previousCCA === player.cca) {
+      baseSkill = player.ccaSkill;
+    }
+    // If CCA changed (and we had a previous CCA), retain 30% as transferable skills
+    else if (previousCCA && previousCCA !== player.cca) {
       baseSkill = Math.floor(player.ccaSkill * 0.3);
+      console.log(`CCA changed from ${previousCCA} to ${player.cca}. Retaining 30%: ${baseSkill}`);
+    }
+    // If this is the first time selecting a CCA (previousCCA is null), start from 0
+    else {
+      baseSkill = 0;
     }
 
     const newCCASkill = Math.min(100, baseSkill + ccaPoints);
+    console.log(`updateCCASkill: base=${baseSkill}, points=${ccaPoints}, new=${newCCASkill}`);
+    
     return {
       ...player,
       ccaSkill: newCCASkill

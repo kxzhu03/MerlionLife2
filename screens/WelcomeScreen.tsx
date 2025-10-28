@@ -113,6 +113,17 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
         careerPath: 'technology' as any,
         promotions: 0
       };
+      
+      // Initialize portfolio for investment screen
+      basePlayer.portfolio = {
+        assets: [],
+        liabilities: [],
+        totalAssetValue: 0,
+        totalLiabilityValue: 0,
+        netWorth: 0,
+        monthlyIncome: 0,
+        monthlyExpenses: 0
+      };
     }
 
     return basePlayer;

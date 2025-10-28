@@ -1,6 +1,242 @@
 import { ChoiceEvent } from '../types/choiceEvents';
 
 export const CHOICE_EVENTS: ChoiceEvent[] = [
+  // === PRIMARY SCHOOL EVENTS ===
+  {
+    id: 'eraser_fight',
+    title: 'The Great Eraser Fight',
+    description: 'During recess, someone starts an eraser fight. Erasers are flying everywhere! The discipline master is coming!',
+    emoji: '✏️',
+    category: 'ridiculous',
+    minAge: 7,
+    maxAge: 12,
+    options: [
+      {
+        id: 'join',
+        text: 'Join the fight!',
+        emoji: '🥊',
+        statChanges: { happiness: 15, stress: -10, reputation: -10, health: -5 },
+        description: 'So fun! But you get caught and have to stay back after school.'
+      },
+      {
+        id: 'hide',
+        text: 'Hide under the desk',
+        emoji: '🙈',
+        statChanges: { happiness: -5, stress: 5, reputation: -5 },
+        description: 'You survive but everyone thinks you\'re a scaredy-cat.'
+      },
+      {
+        id: 'warn',
+        text: 'Warn everyone the teacher is coming',
+        emoji: '🚨',
+        statChanges: { happiness: 10, reputation: 20, socialImpact: 10, leadership: 5 },
+        description: 'You\'re a hero! Everyone thanks you. You saved the day!'
+      },
+      {
+        id: 'report',
+        text: 'Report to the teacher',
+        emoji: '👎',
+        statChanges: { happiness: -20, reputation: -30, socialImpact: -15 },
+        description: 'You\'re now known as the class snitch. Nobody talks to you.'
+      }
+    ]
+  },
+  {
+    id: 'canteen_food',
+    title: 'Canteen Food Mystery',
+    description: 'The canteen auntie gives you extra chicken nuggets for free! But your friend didn\'t get any.',
+    emoji: '🍗',
+    category: 'funny',
+    minAge: 7,
+    maxAge: 12,
+    options: [
+      {
+        id: 'share',
+        text: 'Share with your friend',
+        emoji: '❤️',
+        statChanges: { happiness: 10, socialImpact: 15, reputation: 10 },
+        description: 'Your friend is so happy! The auntie smiles and gives you MORE next time.'
+      },
+      {
+        id: 'eat_all',
+        text: 'Eat them all yourself',
+        emoji: '😋',
+        statChanges: { happiness: 5, health: -5, reputation: -10 },
+        description: 'Delicious! But your friend is sad. You feel a bit guilty.'
+      },
+      {
+        id: 'thank_auntie',
+        text: 'Thank the auntie loudly',
+        emoji: '🙏',
+        statChanges: { happiness: 15, reputation: 15, socialImpact: 10 },
+        description: 'The auntie is touched! She becomes your favorite person. Free food forever!'
+      },
+      {
+        id: 'suspicious',
+        text: 'Get suspicious and don\'t eat them',
+        emoji: '🤔',
+        statChanges: { happiness: -10, stress: 10 },
+        description: 'You throw them away. They were perfectly fine. You\'re hungry now.'
+      }
+    ]
+  },
+  {
+    id: 'pokemon_cards',
+    title: 'Pokemon Card Trade',
+    description: 'A classmate wants to trade their holographic Charizard for your entire collection. It\'s worth way more!',
+    emoji: '🎴',
+    category: 'difficult',
+    minAge: 7,
+    maxAge: 12,
+    options: [
+      {
+        id: 'accept',
+        text: 'Accept the trade immediately!',
+        emoji: '✨',
+        statChanges: { happiness: 25, reputation: 15, wealth: 50 },
+        description: 'BEST TRADE EVER! You\'re the Pokemon master now! Everyone is jealous!'
+      },
+      {
+        id: 'reject',
+        text: 'Reject - something feels wrong',
+        emoji: '❌',
+        statChanges: { happiness: -5, stress: 5 },
+        description: 'Good instinct! The card was fake. You kept your collection safe.'
+      },
+      {
+        id: 'negotiate',
+        text: 'Ask for Charizard + 5 more cards',
+        emoji: '🤝',
+        statChanges: { happiness: 30, reputation: 20, wealth: 100, leadership: 10 },
+        description: 'They agree! You\'re a negotiation genius! Best deal ever!'
+      },
+      {
+        id: 'tell_teacher',
+        text: 'Tell teacher (cards banned in school)',
+        emoji: '👎',
+        statChanges: { happiness: -15, reputation: -25, socialImpact: -20 },
+        description: 'Everyone\'s cards get confiscated. You\'re the most hated kid now.'
+      }
+    ]
+  },
+  {
+    id: 'class_monitor',
+    title: 'Class Monitor Election',
+    description: 'It\'s time to elect a class monitor. Your best friend is running. But you also want to run!',
+    emoji: '🗳️',
+    category: 'difficult',
+    minAge: 7,
+    maxAge: 12,
+    options: [
+      {
+        id: 'run',
+        text: 'Run against your friend',
+        emoji: '🏆',
+        statChanges: { happiness: 10, reputation: 15, leadership: 20, socialImpact: -10 },
+        description: 'You win! But your friendship is strained. Leadership comes with sacrifice.'
+      },
+      {
+        id: 'support',
+        text: 'Support your friend instead',
+        emoji: '❤️',
+        statChanges: { happiness: 15, socialImpact: 20, reputation: 10 },
+        description: 'Your friend wins and is so grateful! True friendship wins!'
+      },
+      {
+        id: 'team_up',
+        text: 'Propose running together as co-monitors',
+        emoji: '🤝',
+        statChanges: { happiness: 20, reputation: 25, leadership: 15, socialImpact: 15 },
+        description: 'Brilliant idea! Teacher loves it! You both win! Power duo!'
+      },
+      {
+        id: 'avoid',
+        text: 'Avoid the whole thing',
+        emoji: '😐',
+        statChanges: { happiness: -5, leadership: -10 },
+        description: 'You stay neutral but miss out on a leadership opportunity.'
+      }
+    ]
+  },
+  {
+    id: 'homework_forgot',
+    title: 'Forgot Homework Crisis',
+    description: 'You forgot to do your homework! Teacher is collecting now! Your friend offers to let you copy.',
+    emoji: '📓',
+    category: 'difficult',
+    minAge: 7,
+    maxAge: 12,
+    options: [
+      {
+        id: 'copy',
+        text: 'Quickly copy your friend\'s work',
+        emoji: '✍️',
+        statChanges: { happiness: 5, stress: -10, academicSkill: -5, reputation: -5 },
+        description: 'You survive! But you didn\'t learn anything. And you feel guilty.'
+      },
+      {
+        id: 'confess',
+        text: 'Confess to the teacher',
+        emoji: '🙇',
+        statChanges: { happiness: -10, stress: 15, reputation: 10, leadership: 5 },
+        description: 'Teacher appreciates your honesty! You get extra time. Integrity wins!'
+      },
+      {
+        id: 'fake_sick',
+        text: 'Pretend to be sick',
+        emoji: '🤒',
+        statChanges: { happiness: -5, stress: 20, health: -5 },
+        description: 'Teacher sends you to sick bay. Now you have to fake being sick all day.'
+      },
+      {
+        id: 'do_now',
+        text: 'Try to do it super fast now',
+        emoji: '⚡',
+        statChanges: { happiness: 10, stress: 25, academicSkill: 10, leadership: 10 },
+        description: 'You finish in 5 minutes! Messy but done! Teacher is impressed by your speed!'
+      }
+    ]
+  },
+  {
+    id: 'playground_bully',
+    title: 'Playground Bully',
+    description: 'A bigger kid is bullying a younger student at the playground. Your friends are watching.',
+    emoji: '😡',
+    category: 'dramatic',
+    minAge: 7,
+    maxAge: 12,
+    options: [
+      {
+        id: 'confront',
+        text: 'Stand up to the bully',
+        emoji: '🦸',
+        statChanges: { happiness: 15, reputation: 25, socialImpact: 30, leadership: 15, health: -10 },
+        description: 'You\'re a hero! The younger kid is saved! Everyone respects you now!'
+      },
+      {
+        id: 'get_teacher',
+        text: 'Run and get a teacher',
+        emoji: '🏃',
+        statChanges: { happiness: 10, socialImpact: 20, reputation: 15 },
+        description: 'Smart move! Teacher stops the bully. You did the right thing!'
+      },
+      {
+        id: 'distract',
+        text: 'Distract the bully with a joke',
+        emoji: '🤡',
+        statChanges: { happiness: 20, socialImpact: 25, reputation: 20, leadership: 10 },
+        description: 'Your joke makes everyone laugh! Bully forgets about fighting. Crisis averted!'
+      },
+      {
+        id: 'walk_away',
+        text: 'Walk away and ignore it',
+        emoji: '🚶',
+        statChanges: { happiness: -15, reputation: -20, socialImpact: -25, stress: 15 },
+        description: 'You feel terrible. The younger kid gets hurt. You can\'t sleep that night.'
+      }
+    ]
+  },
+
   // === RIDICULOUS EVENTS ===
   {
     id: 'durian_challenge',

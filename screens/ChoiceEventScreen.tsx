@@ -119,19 +119,8 @@ const ChoiceEventScreen: React.FC<Props> = ({ navigation, route }) => {
               </View>
               
               {selectedOption?.id === option.id && (
-                <View style={styles.optionPreview}>
-                  <Text style={styles.previewTitle}>Preview:</Text>
-                  {Object.entries(option.statChanges).map(([stat, value]) => {
-                    if (value === 0 || value === undefined) return null;
-                    const isPositive = value > 0;
-                    return (
-                      <Text key={stat} style={styles.previewStat}>
-                        {stat}: <Text style={isPositive ? styles.positive : styles.negative}>
-                          {isPositive ? '+' : ''}{value}
-                        </Text>
-                      </Text>
-                    );
-                  })}
+                <View style={styles.optionSelected}>
+                  <Text style={styles.selectedText}>✓ Selected</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -242,22 +231,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1A202C',
   },
-  optionPreview: {
+  optionSelected: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#CBD5E0',
+    borderTopColor: '#4A90E2',
+    alignItems: 'center',
   },
-  previewTitle: {
-    fontSize: 14,
+  selectedText: {
+    fontSize: 16,
     fontWeight: '700',
-    color: '#4A5568',
-    marginBottom: 8,
-  },
-  previewStat: {
-    fontSize: 14,
-    color: '#4A5568',
-    marginBottom: 4,
+    color: '#4A90E2',
   },
   positive: {
     color: '#48BB78',
