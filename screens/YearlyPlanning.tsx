@@ -20,13 +20,13 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
   const { player } = gameState;
   
   const [academics, setAcademics] = useState(5);
-  const [cca, setCca] = useState(3);
+  const [ccaPoints, setCcaPoints] = useState(3);
   const [volunteering, setVolunteering] = useState(2);
   const [mealChoice, setMealChoice] = useState<MealChoice>(MealChoice.HEALTHY);
   const [tuitionSubjects, setTuitionSubjects] = useState<string[]>([]);
   const [selectedCCA, setSelectedCCA] = useState<string | null>(player.cca || null);
 
-  const totalPoints = academics + cca + volunteering;
+  const totalPoints = academics + ccaPoints + volunteering;
   const maxPoints = ACTIVITY_POINTS_PER_YEAR;
   const canConfirm = totalPoints === maxPoints && selectedCCA !== null;
 
@@ -43,7 +43,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     if (newTotal > maxPoints) return;
 
     if (type === 'academic') setAcademics(Math.max(0, Math.min(10, academics + delta)));
-    if (type === 'cca') setCca(Math.max(0, Math.min(10, cca + delta)));
+    if (type === 'cca') setCcaPoints(Math.max(0, Math.min(10, ccaPoints + delta)));
     if (type === 'social') setVolunteering(Math.max(0, Math.min(10, volunteering + delta)));
   };
 
@@ -68,12 +68,12 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       cca: selectedCCA as any 
     };
     
-    const ap: ActivityPoints = { academics, cca, volunteering };
+    const ap: ActivityPoints = { academics, cca: ccaPoints, volunteering };
     
     // Calculate yearly stats
     const { statsChange, wealthChange } = GameService.calculateYearlyStats(updatedPlayer, ap, mealChoice);
     let finalPlayer = GameService.updatePlayerStats(updatedPlayer, { ...statsChange, wealth: wealthChange });
-    finalPlayer = GameService.updateCCASkill(finalPlayer, cca);
+    finalPlayer = GameService.updateCCASkill(finalPlayer, ccaPoints);
 
     // Check achievements
     finalPlayer = GameService.checkAchievements(finalPlayer);
@@ -97,7 +97,9 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.header}>📅 Plan Your Year</Text>
         <Text style={styles.subheader}>
-          Primary {player.currentYear} • Age {player.age}
+          {player.lifeStageProgress?.currentStage === 'secondary_school' 
+            ? `Secondary ${player.lifeStageProgress?.stageYear || 1}`
+            : `Primary ${player.currentYear}`} • Age {player.age}
         </Text>
 
         {/* Activity Points */}
@@ -143,7 +145,7 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
               >
                 <Text style={styles.controlButtonText}>-</Text>
               </TouchableOpacity>
-              <Text style={styles.pointsValue}>{cca}</Text>
+              <Text style={styles.pointsValue}>{ccaPoints}</Text>
               <TouchableOpacity
                 style={styles.controlButton}
                 onPress={() => adjustPoints('cca', 1)}

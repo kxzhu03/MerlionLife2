@@ -466,3 +466,98 @@ export const SECONDARY_EVENTS: RandomEventData[] = [
 // Export event count for reference
 export const SECONDARY_EVENTS_COUNT = SECONDARY_EVENTS.length;
 
+
+  // Special CCA Talent Programs and Scholarships
+  {
+    id: RandomEvent.SPORTS_SCHOLARSHIP,
+    name: 'Sports Scholarship Offer',
+    description: 'Your exceptional athletic talent has been recognized! You received a sports scholarship offer with special training opportunities.',
+    statChanges: { happiness: 15, wealth: 2000, reputation: 12, leadership: 5 },
+    relationshipEffects: [{ type: RelationshipType.FAMILY, change: 20 }],
+    probability: 0.05,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 75,
+    requiresCCATypes: ['football', 'basketball', 'badminton']
+  },
+  {
+    id: RandomEvent.ARTS_SCHOLARSHIP,
+    name: 'Arts Excellence Scholarship',
+    description: 'Your artistic talent impressed the judges! You received an arts scholarship to pursue your creative passion.',
+    statChanges: { happiness: 15, wealth: 1800, reputation: 12, creativity: 8 },
+    relationshipEffects: [{ type: RelationshipType.FAMILY, change: 18 }],
+    probability: 0.05,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 75,
+    requiresCCATypes: ['art', 'ballet', 'choir']
+  },
+  {
+    id: RandomEvent.STEM_SCHOLARSHIP,
+    name: 'STEM Excellence Award',
+    description: 'Your dedication to science and technology earned you a prestigious STEM scholarship!',
+    statChanges: { happiness: 15, wealth: 2200, reputation: 15, academicSkill: 5 },
+    relationshipEffects: [{ type: RelationshipType.FAMILY, change: 20 }, { type: RelationshipType.MENTOR, change: 15 }],
+    probability: 0.05,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 75,
+    requiresCCATypes: ['coding', 'robotics', 'science_club']
+  },
+  {
+    id: RandomEvent.LEADERSHIP_SCHOLARSHIP,
+    name: 'Leadership Excellence Scholarship',
+    description: 'Your outstanding leadership and debate skills earned you a special scholarship!',
+    statChanges: { happiness: 15, wealth: 2000, reputation: 15, leadership: 8 },
+    relationshipEffects: [{ type: RelationshipType.FAMILY, change: 20 }, { type: RelationshipType.MENTOR, change: 12 }],
+    probability: 0.05,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 75,
+    requiresCCATypes: ['debate']
+  },
+  {
+    id: RandomEvent.NATIONAL_TEAM_SELECTION,
+    name: 'National Youth Team Selection',
+    description: 'You were selected for the national youth team! This is a huge honor and opens many doors.',
+    statChanges: { happiness: 20, reputation: 20, leadership: 6, stress: 8 },
+    relationshipEffects: [{ type: RelationshipType.FAMILY, change: 25 }],
+    probability: 0.02,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 85,
+    requiresCCATypes: ['football', 'basketball', 'badminton']
+  },
+  {
+    id: RandomEvent.INTERNATIONAL_COMPETITION,
+    name: 'International Competition Invitation',
+    description: 'Your CCA excellence earned you a spot to compete internationally! This is a once-in-a-lifetime opportunity.',
+    statChanges: { happiness: 18, reputation: 18, academicSkill: 3, wealth: -500 },
+    relationshipEffects: [{ type: RelationshipType.MENTOR, change: 15 }],
+    probability: 0.03,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 80
+  },
+  {
+    id: RandomEvent.SPECIAL_PROGRAM_INVITATION,
+    name: 'Elite Training Program Invitation',
+    description: 'You were invited to join an elite training program for talented students in your CCA!',
+    statChanges: { happiness: 12, reputation: 10, stress: 6 },
+    probability: 0.08,
+    requiresYear: [2, 3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 70
+  },
+  {
+    id: RandomEvent.CCA_CAPTAIN,
+    name: 'CCA Captain Appointment',
+    description: 'You were appointed as the CCA captain! Your dedication and skills have been recognized.',
+    statChanges: { happiness: 10, leadership: 12, reputation: 8, stress: 5 },
+    relationshipEffects: [{ type: RelationshipType.MENTOR, change: 10 }],
+    probability: 0.1,
+    requiresYear: [3, 4],
+    requiresStage: LifeStage.SECONDARY_SCHOOL,
+    requiresCCASkill: 65
+  }
+];

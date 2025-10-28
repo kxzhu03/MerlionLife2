@@ -95,6 +95,15 @@ export enum RandomEvent {
   BREAKUP = 'breakup',
   EXAM_FAILURE = 'exam_failure',
   SCHOLARSHIP_OFFER = 'scholarship_offer',
+  CCA_TRIALS = 'cca_trials',
+  SPORTS_SCHOLARSHIP = 'sports_scholarship',
+  ARTS_SCHOLARSHIP = 'arts_scholarship',
+  STEM_SCHOLARSHIP = 'stem_scholarship',
+  LEADERSHIP_SCHOLARSHIP = 'leadership_scholarship',
+  NATIONAL_TEAM_SELECTION = 'national_team_selection',
+  INTERNATIONAL_COMPETITION = 'international_competition',
+  SPECIAL_PROGRAM_INVITATION = 'special_program_invitation',
+  CCA_CAPTAIN = 'cca_captain',
   
   // Post-Secondary Events
   ORIENTATION_WEEK = 'orientation_week',
@@ -295,6 +304,8 @@ export interface RandomEventData {
   requiresTraits?: PersonalityTrait[]; // Only occurs with certain traits
   requiresStage?: import('./lifestages').LifeStage;
   requiresGender?: import('./avatar').Gender;
+  requiresCCASkill?: number; // Minimum CCA skill level required
+  requiresCCATypes?: string[]; // Specific CCA types that qualify
 }
 
 export interface GameState {

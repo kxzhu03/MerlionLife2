@@ -87,6 +87,8 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
       if (event.requiresYear && !event.requiresYear.includes(stageYear)) return false;
       if (event.requiresTraits && !event.requiresTraits.some(t => player.personalityTraits?.includes(t))) return false;
       if (event.requiresGender && event.requiresGender !== player.avatarCustomization?.gender) return false;
+      if (event.requiresCCASkill && player.ccaSkill < event.requiresCCASkill) return false;
+      if (event.requiresCCATypes && player.cca && !event.requiresCCATypes.includes(player.cca)) return false;
       return Math.random() < (event.probability || 0.2);
     });
 

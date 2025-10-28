@@ -55,7 +55,12 @@ const OLevelExam: React.FC<Props> = ({ navigation, route }) => {
     const updatedPlayer = {
       ...player,
       examScore: score,
-      postSecondaryOptions: options
+      postSecondaryOptions: options,
+      secondarySchoolData: {
+        ...player.secondarySchoolData!,
+        oLevelScore: isOLevel ? score : player.secondarySchoolData?.oLevelScore,
+        nLevelScore: !isOLevel ? score : player.secondarySchoolData?.nLevelScore
+      }
     };
 
     const newGameState: GameState = {

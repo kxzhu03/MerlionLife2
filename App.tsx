@@ -41,14 +41,14 @@ const App = () => {
         <Stack.Screen name="AvatarBuilder" component={AvatarBuilder} />
         
         {/* Primary School */}
-        <Stack.Screen name="Game" component={GameScreen} />
-        <Stack.Screen name="YearlyPlanning" component={YearlyPlanning} />
-        <Stack.Screen name="PSLEAssessment" component={PSLEAssessment} />
+        <Stack.Screen name="Game" component={GameScreen} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="YearlyPlanning" component={YearlyPlanning} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="PSLEAssessment" component={PSLEAssessment} options={{ gestureEnabled: false }} />
         
         {/* Secondary School */}
-        <Stack.Screen name="SecondarySchool" component={SecondarySchool} />
-        <Stack.Screen name="SecondaryYearPlanning" component={SecondaryYearPlanning} />
-        <Stack.Screen name="OLevelExam" component={OLevelExam} />
+        <Stack.Screen name="SecondarySchool" component={SecondarySchool} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="SecondaryYearPlanning" component={SecondaryYearPlanning} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="OLevelExam" component={OLevelExam} options={{ gestureEnabled: false }} />
         
         {/* Post-Secondary & Career */}
         <Stack.Screen name="PostSecondarySelection" component={PostSecondarySelection} />
