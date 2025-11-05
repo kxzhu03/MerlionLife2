@@ -262,6 +262,10 @@ export interface Player {
   
   // Investment portfolio
   portfolio?: import('./assets').Portfolio;
+
+  // Simple investments/businesses (legacy InvestmentService)
+  investments?: import('./investments').Investment[];
+  businesses?: import('./investments').Business[];
 }
 
 export interface ActivityPoints {

@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/navigation';
 import { GameService } from '../services/GameService';
-import { GameState, Player, SESClass, PSLEStream, PersonalityTrait } from '../types';
-import { LifeStage } from '../types/lifestages';
-import { Gender } from '../types/avatar';
+import { GameState, Player, SESClass, PSLEStream, PersonalityTrait, MealChoice } from '../types';
+import { LifeStage, SecondaryStream, CareerPath } from '../types/lifestages';
+import { Gender, SkinTone, HairStyle, HairColor, ClothingStyle, ClothingColor } from '../types/avatar';
 
 type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -57,10 +57,12 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
       avatar: '👤',
       avatarCustomization: {
         gender: randomGender,
-        skinTone: 'medium',
-        hairStyle: 'short',
-        hairColor: 'black',
-        outfit: 'casual'
+        skinTone: SkinTone.MEDIUM,
+        hairStyle: HairStyle.SHORT,
+        hairColor: HairColor.BLACK,
+        clothingStyle: ClothingStyle.CASUAL,
+        clothingColor: ClothingColor.GRAY,
+        accessories: []
       },
       age,
       grade: age - 6,
@@ -73,14 +75,14 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
         academicSkill: 50 + Math.floor(Math.random() * 40),
         stress: 20 + Math.floor(Math.random() * 30),
         reputation: 40 + Math.floor(Math.random() * 40),
-        workExperience: stage === LifeStage.CAREER ? 50 + Math.floor(Math.random() * 40) : 0,
+  workExperience: stage === LifeStage.EARLY_CAREER ? 50 + Math.floor(Math.random() * 40) : 0,
         leadership: 30 + Math.floor(Math.random() * 50)
       },
       cca: null,
       ccaSkill: 40 + Math.floor(Math.random() * 40),
       parentsOccupation: 'Engineer',
       dailyAllowance: randomSES === SESClass.UPPER ? 15 : randomSES === SESClass.MIDDLE ? 8 : 4,
-      mealChoice: 'healthy' as any,
+  mealChoice: MealChoice.HEALTHY,
       tuitionSubjects: [],
       currentYear: 1,
       psleStream: PSLEStream.EXPRESS,
@@ -91,27 +93,32 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
       lifeStageProgress: {
         currentStage: stage,
         stageYear: 1,
-        totalYears: 0
+        totalYears: 0,
+        age
       }
     };
 
     // Add stage-specific data
     if (stage === LifeStage.SECONDARY_SCHOOL) {
       basePlayer.secondarySchoolData = {
-        stream: 'express' as any,
-        yearStarted: 2020,
+        stream: SecondaryStream.EXPRESS,
+        subjects: [],
         oLevelScore: undefined,
-        nLevelScore: undefined
+        nLevelScore: undefined,
+        coCurricular: [],
+        leadership: []
       };
     }
 
-    if (stage === LifeStage.CAREER) {
+  if (stage === LifeStage.EARLY_CAREER) {
       basePlayer.careerData = {
-        currentJob: 'Software Engineer',
-        salary: 60000 + Math.floor(Math.random() * 80000),
-        yearsInCareer: 1,
-        careerPath: 'technology' as any,
-        promotions: 0
+        currentJob: CareerPath.SOFTWARE_ENGINEER,
+        company: 'Tech Startup Pte Ltd',
+        yearsExperience: 1,
+        monthlySalary: 6000 + Math.floor(Math.random() * 4000),
+        jobSatisfaction: 70,
+        promotions: 0,
+        jobChanges: 0
       };
       
       // Initialize portfolio for investment screen
@@ -135,10 +142,10 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
       player,
       currentYear: 1,
       isGameComplete: false,
-      gamePhase: stage === LifeStage.PRIMARY_SCHOOL ? 'primary' : 
-                  stage === LifeStage.SECONDARY_SCHOOL ? 'secondary' :
-                  stage === LifeStage.POST_SECONDARY ? 'post_secondary' :
-                  stage === LifeStage.CAREER ? 'career' : 'primary'
+  gamePhase: stage === LifeStage.PRIMARY_SCHOOL ? 'primary' : 
+      stage === LifeStage.SECONDARY_SCHOOL ? 'secondary' :
+      stage === LifeStage.POST_SECONDARY ? 'post_secondary' :
+      stage === LifeStage.EARLY_CAREER ? 'career' : 'primary'
     };
 
     await GameService.saveGameState(gameState);
@@ -278,14 +285,14 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.CAREER, 'CareerLife', 25)}
+              onPress={() => skipToPhase(LifeStage.EARLY_CAREER, 'CareerLife', 25)}
             >
               <Text style={styles.debugButtonText}>💼 Career/Adulthood (Age 25)</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.CAREER, 'InvestmentPortfolio', 18)}
+              onPress={() => skipToPhase(LifeStage.EARLY_CAREER, 'InvestmentPortfolio', 18)}
             >
               <Text style={styles.debugButtonText}>📈 Investment Portfolio (Age 18)</Text>
             </TouchableOpacity>

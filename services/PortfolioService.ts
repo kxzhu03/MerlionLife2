@@ -97,7 +97,7 @@ export class PortfolioService {
     const portfolio = player.portfolio || this.initializePortfolio();
 
     // Check if monthly installment is affordable (shouldn't exceed 40% of monthly income)
-    const monthlyIncome = (player.careerData?.salary || 0) / 12;
+    const monthlyIncome = player.careerData?.monthlySalary || 0;
     const totalMonthlyExpenses = portfolio.monthlyExpenses + marketData.monthlyInstallment;
     
     if (totalMonthlyExpenses > monthlyIncome * 0.4 && monthlyIncome > 0) {
