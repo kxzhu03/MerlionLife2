@@ -143,6 +143,86 @@ export enum RandomEvent {
   INHERITANCE = 'inheritance',
   HEALTH_CRISIS = 'health_crisis',
   WINDFALL = 'windfall'
+  ,
+  // Singapore-specific and expanded events
+  HDB_KEY_COLLECTION = 'hdb_key_collection',
+  BTO_BALLOT_LOSS = 'bto_ballot_loss',
+  UPGRADING_FLAT = 'upgrading_flat',
+  PROPERTY_MARKET_CRASH = 'property_market_crash',
+  CPF_WITHDRAWAL_APPROVED = 'cpf_withdrawal_approved',
+  CPF_LIFE_BEGINS = 'cpf_life_begins',
+  MEDISAVE_WITHDRAWAL = 'medisave_withdrawal',
+  NS_ENLISTMENT = 'ns_enlistment',
+  NS_PROMOTION = 'ns_promotion',
+  NS_FIELD_EXERCISE = 'ns_field_exercise',
+  HAWKER_DISCOVERY = 'hawker_discovery',
+  HAWKER_CLOSURE = 'hawker_closure',
+  MRT_DELAY = 'mrt_delay',
+  CAR_PURCHASE = 'car_purchase',
+  PSLE_STREAMING = 'psle_streaming',
+  TUITION_PRESSURE = 'tuition_pressure',
+  STREAMING_REGRET = 'streaming_regret',
+  CRYPTO_BOOM = 'crypto_boom',
+  CRYPTO_CRASH = 'crypto_crash',
+  STOCK_MARKET_CRASH = 'stock_market_crash',
+  INSURANCE_CLAIM_APPROVED = 'insurance_claim_approved',
+  INSURANCE_CLAIM_DENIED = 'insurance_claim_denied',
+  INSURANCE_PREMIUM_INCREASE = 'insurance_premium_increase',
+  RETRENCHMENT = 'retrenchment',
+  SALARY_FREEZE = 'salary_freeze',
+  BONUS_SURPRISE = 'bonus_surprise',
+  PARENTS_RETIREMENT = 'parents_retirement',
+  EXTENDED_FAMILY_GATHERING = 'extended_family_gathering',
+  FAMILY_BUSINESS_CONFLICT = 'family_business_conflict',
+  COVID_LOCKDOWN = 'covid_lockdown',
+  VACCINATION_SIDE_EFFECTS = 'vaccination_side_effects',
+  JOINED_GYM = 'joined_gym',
+  YOGA_CLASS = 'yoga_class',
+  NOISY_NEIGHBOR = 'noisy_neighbor',
+  COMMUNITY_BONDING = 'community_bonding',
+  JURY_DUTY = 'jury_duty',
+  VOLUNTEER_COMMUNITY_SERVICE = 'volunteer_community_service',
+  // Expanded events set
+  INTERNSHIP_SUCCESS = 'internship_success',
+  FAILED_EXAM = 'failed_exam',
+  SCHOLARSHIP_AWARD = 'scholarship_award',
+  GROUP_PROJECT_DISASTER = 'group_project_disaster',
+  MADE_BEST_FRIEND = 'made_best_friend',
+  EXCHANGE_PROGRAM = 'exchange_program',
+  HEALTH_SCARE = 'health_scare',
+  RELATIONSHIP_BEGINS = 'relationship_begins',
+  FINANCIAL_HARDSHIP = 'financial_hardship',
+  FAILED_MODULE = 'failed_module',
+  RESEARCH_OPPORTUNITY = 'research_opportunity',
+  LEADERSHIP_ROLE = 'leadership_role',
+  INTERNSHIP_ABROAD = 'internship_abroad',
+  MENTAL_HEALTH_CRISIS = 'mental_health_crisis',
+  NETWORKING_SUCCESS = 'networking_success',
+  LOVE_TRIANGLE = 'love_triangle',
+  THESIS_BREAKTHROUGH = 'thesis_breakthrough',
+  GRADUATION_HONORS = 'graduation_honors',
+  FIRED = 'fired',
+  TOXIC_BOSS = 'toxic_boss',
+  MENTOR_FOUND = 'mentor_found',
+  WORK_INJURY = 'work_injury',
+  AWARD_RECOGNITION = 'award_recognition',
+  WORK_LIFE_BALANCE = 'work_life_balance',
+  COLLEAGUE_RIVALRY = 'colleague_rivalry',
+  WEDDING_DAY = 'wedding_day',
+  BABY_BORN = 'baby_born',
+  BTO_SUCCESS = 'bto_success',
+  PARENT_ILLNESS = 'parent_illness',
+  CHILD_MILESTONE = 'child_milestone',
+  MARITAL_CONFLICT = 'marital_conflict',
+  SIBLING_SUPPORT = 'sibling_support',
+  DIVORCE = 'divorce',
+  RETIREMENT_PARTY = 'retirement_party',
+  TRAVEL_ADVENTURE = 'travel_adventure',
+  GRANDCHILD_BORN = 'grandchild_born',
+  HEALTH_DECLINE = 'health_decline',
+  VOLUNTEER_WORK = 'volunteer_work',
+  LIFE_REFLECTION = 'life_reflection',
+  LEGACY_PLANNING = 'legacy_planning'
 }
 
 export enum PersonalityTrait {
@@ -301,8 +381,12 @@ export interface CCAOptionData {
   description: string;
 }
 
+// Temporary compatibility types to allow legacy data strings during migration
+type LegacyStageStrings = 'primary' | 'secondary' | 'post_secondary' | 'ns' | 'university' | 'career' | 'retirement';
+type LegacyGenderStrings = 'male' | 'female';
+
 export interface RandomEventData {
-  id: RandomEvent;
+  id: RandomEvent | string; // allow legacy/custom event ids from data files
   name: string;
   description: string;
   statChanges: Partial<PlayerStats>;
@@ -310,8 +394,8 @@ export interface RandomEventData {
   relationshipEffects?: { type: RelationshipType; change: number }[];
   requiresYear?: number[]; // Only occurs in specific years
   requiresTraits?: PersonalityTrait[]; // Only occurs with certain traits
-  requiresStage?: import('./lifestages').LifeStage;
-  requiresGender?: import('./avatar').Gender;
+  requiresStage?: import('./lifestages').LifeStage | LegacyStageStrings;
+  requiresGender?: import('./avatar').Gender | LegacyGenderStrings;
   requiresCCASkill?: number; // Minimum CCA skill level required
   requiresCCATypes?: string[]; // Specific CCA types that qualify
 }

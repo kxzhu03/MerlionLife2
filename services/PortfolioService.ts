@@ -1,6 +1,7 @@
 import { Player } from '../types';
 import { Asset, Liability, Portfolio, AssetMarketData, LiabilityMarketData } from '../types/assets';
 import { ASSET_MARKET_DATA, LIABILITY_MARKET_DATA } from '../data/marketData';
+import { formatCurrency, formatNumber } from '../utils/format';
 
 export class PortfolioService {
   /**
@@ -32,14 +33,14 @@ export class PortfolioService {
     if (totalCost < marketData.minInvestment) {
       return {
         success: false,
-        message: `Minimum investment is $${marketData.minInvestment.toLocaleString()}`
+        message: `Minimum investment is ${formatCurrency(marketData.minInvestment)}`
       };
     }
 
     if (wealth < totalCost) {
       return {
         success: false,
-        message: `Insufficient funds. You need $${totalCost.toLocaleString()} but have $${wealth.toLocaleString()}`
+        message: `Insufficient funds. You need ${formatCurrency(totalCost)} but have ${formatCurrency(wealth)}`
       };
     }
 
@@ -71,7 +72,7 @@ export class PortfolioService {
 
     return {
       success: true,
-      message: `Successfully purchased ${quantity} units of ${marketData.name} for $${totalCost.toLocaleString()}`,
+      message: `Successfully purchased ${formatNumber(quantity)} units of ${marketData.name} for ${formatCurrency(totalCost)}`,
       updatedPlayer
     };
   }
@@ -90,7 +91,7 @@ export class PortfolioService {
     if (wealth < downPaymentAmount) {
       return {
         success: false,
-        message: `Insufficient funds for down payment. You need $${downPaymentAmount.toLocaleString()} but have $${wealth.toLocaleString()}`
+        message: `Insufficient funds for down payment. You need ${formatCurrency(downPaymentAmount)} but have ${formatCurrency(wealth)}`
       };
     }
 
@@ -135,7 +136,7 @@ export class PortfolioService {
 
     return {
       success: true,
-      message: `Successfully purchased ${marketData.name} with $${downPaymentAmount.toLocaleString()} down payment. Monthly installment: $${marketData.monthlyInstallment.toLocaleString()}`,
+      message: `Successfully purchased ${marketData.name} with ${formatCurrency(downPaymentAmount)} down payment. Monthly installment: ${formatCurrency(marketData.monthlyInstallment)}`,
       updatedPlayer
     };
   }
@@ -158,7 +159,7 @@ export class PortfolioService {
     }
 
     const asset = portfolio.assets[assetIndex];
-    const saleValue = asset.currentValue;
+  const saleValue = asset.currentValue;
     
     // Remove asset
     portfolio.assets.splice(assetIndex, 1);
@@ -174,12 +175,12 @@ export class PortfolioService {
 
     const profit = saleValue - (asset.purchasePrice * asset.quantity);
     const profitMsg = profit >= 0 
-      ? `Profit: $${profit.toLocaleString()}`
-      : `Loss: $${Math.abs(profit).toLocaleString()}`;
+      ? `Profit: ${formatCurrency(profit)}`
+      : `Loss: ${formatCurrency(Math.abs(profit))}`;
 
     return {
       success: true,
-      message: `Sold ${asset.name} for $${saleValue.toLocaleString()}. ${profitMsg}`,
+      message: `Sold ${asset.name} for ${formatCurrency(saleValue)}. ${profitMsg}`,
       updatedPlayer
     };
   }

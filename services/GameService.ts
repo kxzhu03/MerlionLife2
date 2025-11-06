@@ -146,7 +146,7 @@ export class GameService {
     return { statsChange, wealthChange };
   }
 
-  static applyRandomEvent(player: Player): RandomEvent | null {
+  static applyRandomEvent(player: Player): RandomEvent | string | null {
     // Filter events based on requirements
     const eligibleEvents = RANDOM_EVENTS.filter(event => {
       // Check year requirements
@@ -163,7 +163,7 @@ export class GameService {
       // Check if event already occurred (some events should only happen once)
       if (player.eventHistory?.includes(event.id)) {
         // Allow repeatable events
-        const nonRepeatableEvents = [
+        const nonRepeatableEvents: (RandomEvent | string)[] = [
           RandomEvent.PARENTS_DIVORCE,
           RandomEvent.GIFTED_PROGRAM,
           RandomEvent.LEARNING_DISABILITY,
@@ -192,7 +192,7 @@ export class GameService {
     return eligibleEvents[0].id;
   }
 
-  static getRandomEventEffects(event: RandomEvent): Partial<PlayerStats> {
+  static getRandomEventEffects(event: RandomEvent | string): Partial<PlayerStats> {
     const eventData = RANDOM_EVENTS.find(e => e.id === event);
     if (!eventData) return {};
     if (event === RandomEvent.ERASER_BUSINESS) {
@@ -203,7 +203,7 @@ export class GameService {
     return { ...eventData.statChanges };
   }
 
-  static updateRelationships(player: Player, event: RandomEvent): Player {
+  static updateRelationships(player: Player, event: RandomEvent | string): Player {
     const eventData = RANDOM_EVENTS.find(e => e.id === event);
     if (!eventData || !eventData.relationshipEffects) return player;
 
