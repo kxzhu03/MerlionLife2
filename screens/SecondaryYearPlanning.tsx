@@ -270,7 +270,7 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
             ))}
           </View>
           {player.cca && selectedCCA !== player.cca && (
-            <Text style={styles.ccaWarning}>⚠️ Changing CCA will retain only 30% of your current skill</Text>
+            <Text style={styles.ccaWarning}>ℹ️ Changing CCA now keeps your existing CCA skill. You won't lose progress.</Text>
           )}
         </View>
 

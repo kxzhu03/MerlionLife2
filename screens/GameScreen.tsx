@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { GameState, Player, RandomEvent, SESClass } from '../types';
+import { LifeStage } from '../types/lifestages';
 import PlayerCard from '../components/PlayerCard';
 import { GameService } from '../services/GameService';
 import { RANDOM_EVENTS, SES_CONFIG } from '../data/constants';
@@ -26,12 +27,13 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [gameState]);
 
   // Reset event gate when year changes
+  const currentYear = gameState?.player.currentYear;
   useEffect(() => {
-    if (gameState && gameState.player.currentYear !== currentYearTracked) {
-      setCurrentYearTracked(gameState.player.currentYear);
+    if (currentYear !== undefined && currentYear !== currentYearTracked) {
+      setCurrentYearTracked(currentYear);
       setHasShownEventForYear(false);
     }
-  }, [gameState?.player.currentYear, currentYearTracked]);
+  }, [currentYear, currentYearTracked]);
 
   // Show random event popup at the start of the year
   useEffect(() => {
@@ -153,7 +155,34 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
         overScrollMode="always"
       >
         <View style={styles.headerRow}>
-          <Text style={styles.header}>🎒 Primary School — Year {gameState.player.currentYear}</Text>
+          {(() => {
+            const lp = gameState.player.lifeStageProgress;
+            let stageName = 'Primary School';
+            let yearLabel = `Year ${gameState.player.currentYear}`;
+            if (lp?.currentStage !== undefined) {
+              switch (lp.currentStage) {
+                case LifeStage.PRIMARY_SCHOOL:
+                  stageName = 'Primary School';
+                  yearLabel = `Year ${lp.stageYear || gameState.player.currentYear}`;
+                  break;
+                case LifeStage.SECONDARY_SCHOOL:
+                  stageName = 'Secondary School';
+                  yearLabel = `Year ${lp.stageYear || 1}`;
+                  break;
+                case LifeStage.POST_SECONDARY:
+                  stageName = 'Post-Secondary';
+                  yearLabel = `Year ${lp.stageYear || 1}`;
+                  break;
+                case LifeStage.EARLY_CAREER:
+                  stageName = 'Career & Life';
+                  yearLabel = `Year ${lp.stageYear || 1}`;
+                  break;
+              }
+            }
+            return (
+              <Text style={styles.header}>🎒 {stageName} — {yearLabel}</Text>
+            );
+          })()}
           <TouchableOpacity onPress={goToProfile} style={styles.profileBtn}>
             <Text style={styles.profileBtnText}>📋</Text>
           </TouchableOpacity>

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Player, PlayerStats, SESClass, ActivityPoints, MealChoice, RandomEvent, PSLEStream, GameState, PersonalityTrait, Relationship, RelationshipType, Achievement, AchievementType } from '../types';
+import { LifeStage } from '../types/lifestages';
 import { SES_CONFIG, RANDOM_EVENTS, PSLE_STREAM_THRESHOLDS, ACTIVITY_POINTS_PER_YEAR, HEALTHY_MEAL_COST, UNHEALTHY_MEAL_COST, HEALTHY_MEAL_HEALTH_BONUS, UNHEALTHY_MEAL_HEALTH_PENALTY, SPECIAL_PROGRAM_SKILL_THRESHOLD, ACHIEVEMENTS } from '../data/constants';
 
 export class GameService {
@@ -84,15 +85,16 @@ export class GameService {
   ): { statsChange: Partial<PlayerStats>; wealthChange: number } {
     const statsChange: Partial<PlayerStats> = {};
     let wealthChange = 0;
+    const stage = player.lifeStageProgress?.currentStage ?? LifeStage.PRIMARY_SCHOOL;
 
-    // Academic points effect (1:1)
-    statsChange.academicSkill = activityPoints.academics;
-    statsChange.stress = 0;
+    // Academic points effect (reduced scaling for tougher growth)
+    statsChange.academicSkill = Math.max(0, Math.round(activityPoints.academics * 0.8));
+    statsChange.stress = 2;
     
     // High academic workload increases stress
     if (activityPoints.academics > 7) {
-      statsChange.health = -(activityPoints.academics - 7) * 2;
-      statsChange.stress = (activityPoints.academics - 7) * 3;
+      statsChange.health = (statsChange.health || 0) - (activityPoints.academics - 7) * 2;
+      statsChange.stress = (statsChange.stress || 0) + (activityPoints.academics - 7) * 3;
     }
 
     // CCA points effect
@@ -107,8 +109,8 @@ export class GameService {
       }
     }
 
-    // Volunteering points effect (1:1)
-    statsChange.socialImpact = activityPoints.volunteering;
+    // Volunteering points effect (slightly reduced scaling)
+    statsChange.socialImpact = Math.max(0, Math.round(activityPoints.volunteering * 0.8));
     if (activityPoints.volunteering > 3) {
       statsChange.happiness = (statsChange.happiness || 0) + 2;
     }
@@ -139,14 +141,24 @@ export class GameService {
       statsChange.stress = (statsChange.stress || 0) + 2;
     }
 
-    // Yearly wealth: (allowance - mealCost) * 365
+    // Baseline yearly decay to keep stats challenging
+    const fatiguePenalty = stage === LifeStage.PRIMARY_SCHOOL ? 3 : stage === LifeStage.SECONDARY_SCHOOL ? 5 : 6;
+    statsChange.happiness = (statsChange.happiness || 0) - fatiguePenalty;
+    statsChange.health = (statsChange.health || 0) - Math.max(2, Math.floor(fatiguePenalty / 2));
+    statsChange.socialImpact = (statsChange.socialImpact || 0) - 1;
+    statsChange.stress = (statsChange.stress || 0) + (stage === LifeStage.PRIMARY_SCHOOL ? 2 : 4);
+
+    // Yearly wealth: (allowance - mealCost) * 365 minus living expenses by stage
     const dailyMealCost = mealChoice === MealChoice.HEALTHY ? HEALTHY_MEAL_COST : UNHEALTHY_MEAL_COST;
-    wealthChange = (player.dailyAllowance - dailyMealCost) * 365;
+    const baseExpenses = stage === LifeStage.PRIMARY_SCHOOL
+      ? 300 + player.age * 20
+      : 700 + player.age * 25;
+    wealthChange = (player.dailyAllowance - dailyMealCost) * 365 - baseExpenses;
 
     return { statsChange, wealthChange };
   }
 
-  static applyRandomEvent(player: Player): RandomEvent | string | null {
+  static applyRandomEvent(player: Player): RandomEvent | null {
     // Filter events based on requirements
     const eligibleEvents = RANDOM_EVENTS.filter(event => {
       // Check year requirements
@@ -163,7 +175,7 @@ export class GameService {
       // Check if event already occurred (some events should only happen once)
       if (player.eventHistory?.includes(event.id)) {
         // Allow repeatable events
-        const nonRepeatableEvents: (RandomEvent | string)[] = [
+        const nonRepeatableEvents: RandomEvent[] = [
           RandomEvent.PARENTS_DIVORCE,
           RandomEvent.GIFTED_PROGRAM,
           RandomEvent.LEARNING_DISABILITY,
@@ -185,14 +197,14 @@ export class GameService {
     for (const event of eligibleEvents) {
       random -= event.probability;
       if (random <= 0) {
-        return event.id;
+        return event.id as RandomEvent;
       }
     }
 
-    return eligibleEvents[0].id;
+    return eligibleEvents[0].id as RandomEvent;
   }
 
-  static getRandomEventEffects(event: RandomEvent | string): Partial<PlayerStats> {
+  static getRandomEventEffects(event: RandomEvent): Partial<PlayerStats> {
     const eventData = RANDOM_EVENTS.find(e => e.id === event);
     if (!eventData) return {};
     if (event === RandomEvent.ERASER_BUSINESS) {
@@ -203,7 +215,7 @@ export class GameService {
     return { ...eventData.statChanges };
   }
 
-  static updateRelationships(player: Player, event: RandomEvent | string): Player {
+  static updateRelationships(player: Player, event: RandomEvent): Player {
     const eventData = RANDOM_EVENTS.find(e => e.id === event);
     if (!eventData || !eventData.relationshipEffects) return player;
 
@@ -258,7 +270,7 @@ export class GameService {
     };
 
     const nameList = names[type];
-    const name = nameList[Math.floor(Math.random() * nameList.length)];
+  const name = nameList[Math.floor(Math.random() * nameList.length)];
 
     return {
       id: `${type}_${Date.now()}`,

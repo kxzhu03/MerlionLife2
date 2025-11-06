@@ -156,47 +156,60 @@ export class SecondarySchoolService {
   ): Partial<PlayerStats> {
     const changes: Partial<PlayerStats> = {};
     
-    // Academic skill
-    changes.academicSkill = academicFocus * 2;
+    // Academic skill grows more slowly to make grades harder to maintain
+    changes.academicSkill = Math.min(7, Math.max(0, Math.round(academicFocus * 0.9)));
     if (player.tuitionSubjects && player.tuitionSubjects.length > 0) {
-      changes.academicSkill += player.tuitionSubjects.length * 1.5;
+      changes.academicSkill += Math.min(3, Math.round(player.tuitionSubjects.length * 1));
     }
     
-    // Stress from academics
-    changes.stress = academicFocus * 1.5;
-    if (academicFocus >= 8) changes.stress += 5;
+    // Stress ramps up faster in secondary school
+    changes.stress = Math.round(academicFocus * 1.6);
+    if (academicFocus >= 8) changes.stress += 4;
     
-    // Tuition stress
+    // Tuition stress (higher to reflect tighter schedules)
     if (player.tuitionSubjects && player.tuitionSubjects.length > 0) {
       changes.stress += player.tuitionSubjects.length * 2;
     }
     
-    // CCA benefits
+    // CCA benefits (still helpful but not a full antidote)
     if (ccaFocus >= 3) {
-      changes.health = ccaFocus * 1.5;
-      changes.stress = (changes.stress || 0) - ccaFocus;
-      changes.happiness = ccaFocus;
+      changes.health = Math.round(ccaFocus * 0.8);
+      changes.stress = (changes.stress || 0) - Math.round(ccaFocus * 0.5);
+      changes.happiness = Math.round(ccaFocus * 0.6);
     } else {
-      changes.happiness = -3;
-      changes.health = -2;
+      changes.happiness = -2;
+      changes.health = -1;
     }
     
-    // Social/volunteering
-    changes.socialImpact = socialFocus * 2;
+    // Social/volunteering (reduced scaling, easier to slip backwards)
+    changes.socialImpact = Math.round(socialFocus * 1.2);
     if (socialFocus >= 3) {
-      changes.happiness = (changes.happiness || 0) + socialFocus;
-      changes.reputation = socialFocus * 0.5;
+      changes.happiness = (changes.happiness || 0) + Math.round(socialFocus * 0.6);
+      changes.reputation = Math.round(socialFocus * 0.3);
+    } else {
+      changes.socialImpact = (changes.socialImpact || 0) - 2;
+      changes.reputation = Math.min(0, (changes.reputation || 0) - 1);
     }
     
-    // Leadership from CCA and social activities
+    // Leadership from CCA and social activities (slower growth)
     if (ccaFocus >= 5 || socialFocus >= 5) {
-      changes.leadership = Math.floor((ccaFocus + socialFocus) / 3);
+      changes.leadership = Math.max(1, Math.floor((ccaFocus + socialFocus) / 4));
     }
     
     // Work experience if doing part-time work
     if (player.stats.workExperience && player.stats.workExperience > 0) {
-      changes.workExperience = 2;
+      changes.workExperience = 1; // slower growth
     }
+
+    // Baseline burnout from balancing commitments
+    const workload = academicFocus + ccaFocus + socialFocus;
+    const burnout = Math.max(2, Math.round(workload / 3));
+    changes.happiness = (changes.happiness || 0) - burnout;
+    changes.health = (changes.health || 0) - Math.max(2, Math.round(academicFocus / 2));
+    changes.stress = (changes.stress || 0) + Math.max(3, Math.round(workload / 2));
+
+    // Annual personal expenses eat into savings
+    changes.wealth = (changes.wealth || 0) - 800;
     
     return changes;
   }

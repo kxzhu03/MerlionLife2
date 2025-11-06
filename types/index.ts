@@ -325,7 +325,7 @@ export interface Player {
   personalityTraits?: PersonalityTrait[];
   relationships?: Relationship[];
   achievements?: Achievement[];
-  eventHistory?: string[];
+  eventHistory?: RandomEvent[];
   examScore?: number;
   postSecondaryOptions?: import('./lifestages').PostSecondaryPath[];
   
@@ -386,7 +386,7 @@ type LegacyStageStrings = 'primary' | 'secondary' | 'post_secondary' | 'ns' | 'u
 type LegacyGenderStrings = 'male' | 'female';
 
 export interface RandomEventData {
-  id: RandomEvent | string; // allow legacy/custom event ids from data files
+  id: RandomEvent;
   name: string;
   description: string;
   statChanges: Partial<PlayerStats>;
@@ -394,8 +394,8 @@ export interface RandomEventData {
   relationshipEffects?: { type: RelationshipType; change: number }[];
   requiresYear?: number[]; // Only occurs in specific years
   requiresTraits?: PersonalityTrait[]; // Only occurs with certain traits
-  requiresStage?: import('./lifestages').LifeStage | LegacyStageStrings;
-  requiresGender?: import('./avatar').Gender | LegacyGenderStrings;
+  requiresStage?: import('./lifestages').LifeStage;
+  requiresGender?: import('./avatar').Gender;
   requiresCCASkill?: number; // Minimum CCA skill level required
   requiresCCATypes?: string[]; // Specific CCA types that qualify
 }

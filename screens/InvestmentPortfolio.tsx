@@ -432,6 +432,9 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
                   value={buyQuantity}
                   onChangeText={setBuyQuantity}
                   keyboardType="numeric"
+                  returnKeyType="done"
+                  blurOnSubmit={true}
+                  onSubmitEditing={() => handleBuyAsset()}
                   placeholder="Enter quantity"
                 />
                 <Text style={styles.totalCost}>

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Player } from '../types';
 import EnhancedStatBar from './EnhancedStatBar';
+import { LifeStage } from '../types/lifestages';
 
 interface PlayerCardProps {
   player: Player;
@@ -9,13 +10,35 @@ interface PlayerCardProps {
 }
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ player, statsChanges }) => {
+  // Derive stage/level label from lifeStageProgress when available
+  const lp = player.lifeStageProgress;
+  let stageLabel = `Primary ${player.grade}`;
+  if (lp?.currentStage !== undefined) {
+    switch (lp.currentStage) {
+      case LifeStage.PRIMARY_SCHOOL:
+        stageLabel = `Primary ${lp.stageYear || player.grade}`;
+        break;
+      case LifeStage.SECONDARY_SCHOOL:
+        stageLabel = `Secondary ${lp.stageYear || 1}`;
+        break;
+      case LifeStage.POST_SECONDARY:
+        stageLabel = `Post-Secondary ${lp.stageYear || 1}`;
+        break;
+      case LifeStage.EARLY_CAREER:
+        stageLabel = `Career Year ${lp.stageYear || 1}`;
+        break;
+      default:
+        stageLabel = `Primary ${player.grade}`;
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.avatar}>{player.avatar}</Text>
         <View style={styles.info}>
           <Text style={styles.name}>{player.name}</Text>
-          <Text style={styles.details}>Age {player.age} | Primary {player.grade}</Text>
+          <Text style={styles.details}>Age {player.age} | {stageLabel}</Text>
           <Text style={styles.ses}>{player.sesClass.toUpperCase()} CLASS</Text>
           <Text style={styles.occupation}>{"Parents' occupation: "}{player.parentsOccupation}</Text>
         </View>

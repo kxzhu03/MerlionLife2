@@ -13,6 +13,64 @@ interface Props {
   navigation: WelcomeScreenNavigationProp;
 }
 
+type DebugShortcut = {
+  key: string;
+  label: string;
+  subtitle: string;
+  emoji: string;
+  stage: LifeStage;
+  screen: keyof RootStackParamList;
+  age: number;
+};
+
+const DEBUG_SHORTCUTS: DebugShortcut[] = [
+  {
+    key: 'primary',
+    label: 'Primary School',
+    subtitle: 'Age 7',
+    emoji: '🎒',
+    stage: LifeStage.PRIMARY_SCHOOL,
+    screen: 'Game',
+    age: 7
+  },
+  {
+    key: 'secondary',
+    label: 'Secondary School',
+    subtitle: 'Age 13',
+    emoji: '📚',
+    stage: LifeStage.SECONDARY_SCHOOL,
+    screen: 'SecondarySchool',
+    age: 13
+  },
+  {
+    key: 'postSecondary',
+    label: 'Post-Secondary',
+    subtitle: 'Age 17',
+    emoji: '🎓',
+    stage: LifeStage.POST_SECONDARY,
+    screen: 'PostSecondarySelection',
+    age: 17
+  },
+  {
+    key: 'career',
+    label: 'Career & Life',
+    subtitle: 'Age 25',
+    emoji: '💼',
+    stage: LifeStage.EARLY_CAREER,
+    screen: 'CareerLife',
+    age: 25
+  },
+  {
+    key: 'investments',
+    label: 'Investment Lab',
+    subtitle: 'Age 18',
+    emoji: '📈',
+    stage: LifeStage.EARLY_CAREER,
+    screen: 'InvestmentPortfolio',
+    age: 18
+  }
+];
+
 const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
   const [hasExistingGame, setHasExistingGame] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
@@ -35,7 +93,18 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
   const handleContinue = async () => {
     const gameState = await GameService.loadGameState();
     if (gameState) {
-      navigation.navigate('Game', { gameState });
+      // Route to the correct screen based on saved life stage
+      const stage = gameState.player?.lifeStageProgress?.currentStage;
+      if (stage === LifeStage.SECONDARY_SCHOOL) {
+        navigation.navigate('SecondarySchool', { gameState });
+      } else if (stage === LifeStage.POST_SECONDARY) {
+        navigation.navigate('PostSecondarySelection', { gameState });
+      } else if (stage === LifeStage.EARLY_CAREER) {
+        navigation.navigate('CareerLife', { gameState });
+      } else {
+        // Default to primary school
+        navigation.navigate('Game', { gameState });
+      }
     }
   };
 
@@ -183,6 +252,25 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
         </View>
 
+        {/* Debug Shortcuts */}
+        <View style={styles.debugSection}>
+          <Text style={styles.sectionTitle}>Debug Shortcuts</Text>
+          <Text style={styles.debugHint}>Jump straight into any life stage to test flows quickly.</Text>
+          <View style={styles.debugGrid}>
+            {DEBUG_SHORTCUTS.map(shortcut => (
+              <TouchableOpacity
+                key={shortcut.key}
+                style={styles.debugCard}
+                onPress={() => skipToPhase(shortcut.stage, shortcut.screen, shortcut.age)}
+              >
+                <Text style={styles.debugCardEmoji}>{shortcut.emoji}</Text>
+                <Text style={styles.debugCardLabel}>{shortcut.label}</Text>
+                <Text style={styles.debugCardSubtitle}>{shortcut.subtitle}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Life Stages Preview */}
         <View style={styles.stagesSection}>
           <Text style={styles.sectionTitle}>Life Stages</Text>
@@ -262,40 +350,15 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.debugTitle}>🛠️ Debug Menu</Text>
             <Text style={styles.debugSubtitle}>Skip to any life phase with random stats</Text>
 
-            <TouchableOpacity
-              style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.PRIMARY_SCHOOL, 'Game', 7)}
-            >
-              <Text style={styles.debugButtonText}>🎒 Primary School (Age 7)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.SECONDARY_SCHOOL, 'SecondarySchool', 13)}
-            >
-              <Text style={styles.debugButtonText}>📚 Secondary School (Age 13)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.POST_SECONDARY, 'PostSecondarySelection', 17)}
-            >
-              <Text style={styles.debugButtonText}>🎓 Post-Secondary (Age 17)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.EARLY_CAREER, 'CareerLife', 25)}
-            >
-              <Text style={styles.debugButtonText}>💼 Career/Adulthood (Age 25)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.debugButton}
-              onPress={() => skipToPhase(LifeStage.EARLY_CAREER, 'InvestmentPortfolio', 18)}
-            >
-              <Text style={styles.debugButtonText}>📈 Investment Portfolio (Age 18)</Text>
-            </TouchableOpacity>
+            {DEBUG_SHORTCUTS.map(shortcut => (
+              <TouchableOpacity
+                key={shortcut.key}
+                style={styles.debugButton}
+                onPress={() => skipToPhase(shortcut.stage, shortcut.screen, shortcut.age)}
+              >
+                <Text style={styles.debugButtonText}>{`${shortcut.emoji} ${shortcut.label} (${shortcut.subtitle})`}</Text>
+              </TouchableOpacity>
+            ))}
 
             <TouchableOpacity
               style={[styles.debugButton, styles.debugCloseButton]}
@@ -389,6 +452,50 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  debugSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+  },
+  debugHint: {
+    fontSize: 14,
+    color: '#718096',
+    marginBottom: 16,
+  },
+  debugGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  debugCard: {
+    flexBasis: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+    marginBottom: 12,
+  },
+  debugCardEmoji: {
+    fontSize: 32,
+    marginBottom: 12,
+  },
+  debugCardLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A202C',
+    textAlign: 'center',
+  },
+  debugCardSubtitle: {
+    fontSize: 12,
+    color: '#718096',
+    marginTop: 4,
   },
   stagesSection: {
     paddingHorizontal: 24,
