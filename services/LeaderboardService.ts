@@ -1,4 +1,5 @@
 import { Player } from '../types';
+import { HousingType } from '../types/lifestages';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -248,8 +249,8 @@ export class LeaderboardService {
       achievements.push('Long-term Marriage');
     }
 
-    // Housing achievements
-    if (player.housingData?.currentHousing === 'landed_property') achievements.push('Landed Property Owner');
+  // Housing achievements
+  if (player.housingData?.currentHousing === HousingType.LANDED) achievements.push('Landed Property Owner');
 
     // Health achievements
     if (player.stats.health > 85 && player.age > 50) achievements.push('Healthy Aging');

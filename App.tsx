@@ -37,7 +37,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
+  <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }} initialRouteName="Welcome">
         {/* Welcome & Character Creation */}
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="CharacterCreation" component={CharacterCreation} />

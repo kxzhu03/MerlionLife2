@@ -184,7 +184,7 @@ const GameScreen: React.FC<Props> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   scroll: { flex: 1 },
-  webScroll: { overflow: 'auto' },
+  webScroll: { overflow: 'visible' },
   scrollContent: { paddingTop: 30, paddingHorizontal: 16, paddingBottom: 40 },
   headerRow: {
     flexDirection: 'row',

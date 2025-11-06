@@ -181,7 +181,7 @@ const LifeSummary: React.FC<Props> = ({ navigation, route }) => {
           <View style={styles.achievementsList}>
             {achievements.map((achievement, index) => (
               <View key={index} style={styles.achievementPill}>
-                <Text style={styles.achievementText}>{achievement.replace(/_/g, ' ')}</Text>
+                <Text style={styles.achievementText}>{(achievement as any).name ?? (achievement as any).id.replace(/_/g, ' ')}</Text>
               </View>
             ))}
           </View>

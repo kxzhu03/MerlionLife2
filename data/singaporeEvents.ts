@@ -1,4 +1,5 @@
-import { RandomEvent, RandomEventData, PersonalityTrait, RelationshipType } from '../types';
+import { RandomEvent, RandomEventData, PersonalityTrait, RelationshipType, Gender } from '../types';
+import { LifeStage } from '../types/lifestages';
 
 // Singapore-Specific Events with Deep Storylines
 export const SINGAPORE_EVENTS: RandomEventData[] = [
@@ -9,15 +10,15 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You collected the keys to your new HDB flat! Your dream home is finally yours. Moving day is next week.',
     statChanges: { happiness: 20, stress: 5, wealth: -1000 },
     probability: 0.15,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.BTO_BALLOT_LOSS,
     name: 'BTO Ballot Disappointment',
-    description: 'You didn\'t win the BTO ballot this round. Only 30% success rate. You\'ll try again next year.',
+    description: "You didn't win the BTO ballot this round. Only 30% success rate. You'll try again next year.",
     statChanges: { happiness: -10, stress: 8 },
     probability: 0.12,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.UPGRADING_FLAT,
@@ -25,15 +26,15 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your family is growing. You sold your 3-room and upgraded to a 4-room HDB. Better space for everyone!',
     statChanges: { happiness: 15, wealth: -20000, stress: -5 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.PROPERTY_MARKET_CRASH,
     name: 'Property Market Downturn',
-    description: 'The property market crashed. Your HDB value dropped by 15%. But you\'re not selling, so it\'s just paper loss.',
+    description: "The property market crashed. Your HDB value dropped by 15%. But you're not selling, so it's just paper loss.",
     statChanges: { stress: 8, happiness: -5 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // CPF & Financial Events
@@ -43,15 +44,15 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your CPF withdrawal for housing was approved! $50,000 transferred to your account.',
     statChanges: { happiness: 12, wealth: 50000 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.CPF_LIFE_BEGINS,
     name: 'CPF LIFE Payouts Begin',
-    description: 'You\'ve reached 65 and CPF LIFE payouts started. Monthly income of $1,500 for life!',
+    description: "You've reached 65 and CPF LIFE payouts started. Monthly income of $1,500 for life!",
     statChanges: { happiness: 15, stress: -10 },
     probability: 0.2,
-    requiresStage: 'retirement'
+    requiresStage: LifeStage.RETIREMENT
   },
   {
     id: RandomEvent.MEDISAVE_WITHDRAWAL,
@@ -59,7 +60,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You used your Medisave account to pay for medical treatment. $3,000 covered.',
     statChanges: { health: 10, wealth: -3000 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // NS Events (Males)
@@ -69,8 +70,8 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You reported to Tekong for Basic Military Training. Two years of your life dedicated to national service.',
     statChanges: { stress: 15, health: 5, happiness: -5 },
     probability: 0.3,
-    requiresStage: 'post_secondary',
-    requiresGender: 'male'
+    requiresStage: LifeStage.POST_SECONDARY,
+    requiresGender: Gender.MALE
   },
   {
     id: RandomEvent.NS_PROMOTION,
@@ -78,8 +79,8 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You were promoted to Lance Corporal. Your leadership was recognized. Small allowance increase.',
     statChanges: { happiness: 10, reputation: 10, wealth: 500 },
     probability: 0.15,
-    requiresStage: 'post_secondary',
-    requiresGender: 'male'
+    requiresStage: LifeStage.POST_SECONDARY,
+    requiresGender: Gender.MALE
   },
   {
     id: RandomEvent.NS_FIELD_EXERCISE,
@@ -87,8 +88,8 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'A 3-day field exercise in the Straits. You were exhausted but it built your resilience.',
     statChanges: { health: -10, stress: 12, leadership: 5 },
     probability: 0.2,
-    requiresStage: 'post_secondary',
-    requiresGender: 'male'
+    requiresStage: LifeStage.POST_SECONDARY,
+    requiresGender: Gender.MALE
   },
 
   // Hawker & Food Culture
@@ -98,15 +99,15 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You discovered an amazing hawker stall near your home. Cheap, delicious, and now your daily lunch spot!',
     statChanges: { happiness: 8, health: 3, wealth: -200 },
     probability: 0.15,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.HAWKER_CLOSURE,
     name: 'Favorite Hawker Stall Closed',
-    description: 'Your favorite hawker uncle retired. The stall you loved for years is gone. You\'ll miss those meals.',
+    description: "Your favorite hawker uncle retired. The stall you loved for years is gone. You'll miss those meals.",
     statChanges: { happiness: -8, stress: 3 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.FOOD_POISONING,
@@ -114,7 +115,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You got food poisoning from a hawker stall. Spent the day in the hospital. Lesson learned: check hygiene ratings.',
     statChanges: { health: -20, stress: 10, wealth: -500 },
     probability: 0.05,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // MRT & Transport
@@ -124,7 +125,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'The MRT broke down during rush hour. You were stuck for 45 minutes. Stressful commute!',
     statChanges: { stress: 8, happiness: -5 },
     probability: 0.12,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.CAR_PURCHASE,
@@ -132,7 +133,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You saved up and bought a Toyota. No more MRT! But now you have car loan and insurance payments.',
     statChanges: { happiness: 12, wealth: -50000, stress: 5 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Education System Events
@@ -142,7 +143,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You received your PSLE results and stream placement. Your score determines your secondary school path.',
     statChanges: { stress: -10, happiness: 8 },
     probability: 0.3,
-    requiresStage: 'primary'
+    requiresStage: LifeStage.PRIMARY_SCHOOL
   },
   {
     id: RandomEvent.TUITION_PRESSURE,
@@ -150,15 +151,15 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your parents enrolled you in 5 tuition classes. Between school and tuition, you have no free time.',
     statChanges: { stress: 15, happiness: -10, academicSkill: 8 },
     probability: 0.1,
-    requiresStage: 'primary'
+    requiresStage: LifeStage.PRIMARY_SCHOOL
   },
   {
     id: RandomEvent.STREAMING_REGRET,
     name: 'Regret About Stream Choice',
-    description: 'You\'re struggling in the Express stream. You wish you had chosen Normal Academic. Too late now.',
+    description: "You're struggling in the Express stream. You wish you had chosen Normal Academic. Too late now.",
     statChanges: { stress: 10, happiness: -8, academicSkill: -5 },
     probability: 0.08,
-    requiresStage: 'secondary'
+    requiresStage: LifeStage.SECONDARY_SCHOOL
   },
 
   // Crypto & Investment Crashes
@@ -168,7 +169,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your Bitcoin investment tripled! You made $30,000 in profit. Time to cash out?',
     statChanges: { happiness: 18, wealth: 30000 },
     probability: 0.06,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.CRYPTO_CRASH,
@@ -176,7 +177,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'The crypto market crashed 60% overnight. Your $50,000 investment is now worth $20,000. Devastating loss.',
     statChanges: { happiness: -20, stress: 20, wealth: -30000 },
     probability: 0.05,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.STOCK_MARKET_CRASH,
@@ -184,7 +185,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'The stock market dropped 15% due to global economic concerns. Your portfolio lost $10,000.',
     statChanges: { stress: 12, happiness: -8, wealth: -10000 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Insurance Events
@@ -194,7 +195,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your medical insurance claim was approved. $5,000 reimbursement received!',
     statChanges: { happiness: 10, wealth: 5000 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.INSURANCE_CLAIM_DENIED,
@@ -202,7 +203,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your insurance claim was denied due to pre-existing condition clause. You have to pay $8,000 out of pocket.',
     statChanges: { happiness: -15, stress: 15, wealth: -8000 },
     probability: 0.06,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.INSURANCE_PREMIUM_INCREASE,
@@ -210,7 +211,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your insurance company increased premiums by 20% due to age and health factors.',
     statChanges: { stress: 8, wealth: -2000 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Job Market Events
@@ -220,7 +221,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your company announced retrenchment. You received a severance package but need to find a new job.',
     statChanges: { happiness: -15, stress: 20, wealth: 20000 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.SALARY_FREEZE,
@@ -228,7 +229,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Due to economic downturn, the company announced a salary freeze for 2 years. No raise for you.',
     statChanges: { happiness: -8, stress: 8 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.BONUS_SURPRISE,
@@ -236,7 +237,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your company gave an unexpected mid-year bonus! $5,000 extra in your account.',
     statChanges: { happiness: 15, wealth: 5000 },
     probability: 0.12,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Family & Relationship Events
@@ -246,7 +247,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your parents retired. You now have more responsibility to support them financially.',
     statChanges: { stress: 10, happiness: 5, wealth: -2000 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.EXTENDED_FAMILY_GATHERING,
@@ -255,7 +256,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     statChanges: { happiness: 12, stress: 5 },
     relationshipEffects: [{ type: RelationshipType.FAMILY, change: 10 }],
     probability: 0.15,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.FAMILY_BUSINESS_CONFLICT,
@@ -264,7 +265,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     statChanges: { stress: 18, happiness: -12 },
     relationshipEffects: [{ type: RelationshipType.FAMILY, change: -20 }],
     probability: 0.06,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Health & Pandemic Events
@@ -274,7 +275,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Singapore entered lockdown. You worked from home for 2 months. Monotonous but safe.',
     statChanges: { stress: 10, happiness: -8, health: -5 },
     probability: 0.05,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.VACCINATION_SIDE_EFFECTS,
@@ -282,7 +283,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You experienced side effects from vaccination. Fever and body aches for 2 days.',
     statChanges: { health: -10, stress: 5 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Lifestyle Events
@@ -292,15 +293,15 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You joined a gym and started working out regularly. Your health and confidence improved!',
     statChanges: { health: 15, happiness: 8, stress: -5, wealth: -500 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.YOGA_CLASS,
     name: 'Discovered Yoga',
-    description: 'You took up yoga for stress relief. It\'s helping you find inner peace.',
+    description: "You took up yoga for stress relief. It's helping you find inner peace.",
     statChanges: { stress: -12, happiness: 10, health: 8 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Neighborhood Events
@@ -310,7 +311,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your neighbor plays loud music every night. Sleep deprivation is affecting your work.',
     statChanges: { stress: 12, happiness: -10, health: -8 },
     probability: 0.08,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.COMMUNITY_BONDING,
@@ -318,7 +319,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'Your HDB block organized a community bonding session. Made new friends in the neighborhood!',
     statChanges: { happiness: 12, socialImpact: 10 },
     probability: 0.1,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
 
   // Civic Events
@@ -328,7 +329,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You received a jury duty summons. 2 weeks away from work for court proceedings.',
     statChanges: { stress: 8, happiness: 5, reputation: 5, wealth: -2000 },
     probability: 0.05,
-    requiresStage: 'career'
+    requiresStage: LifeStage.EARLY_CAREER
   },
   {
     id: RandomEvent.VOLUNTEER_COMMUNITY_SERVICE,
@@ -336,7 +337,7 @@ export const SINGAPORE_EVENTS: RandomEventData[] = [
     description: 'You volunteered at a community center helping underprivileged children. Rewarding experience!',
     statChanges: { happiness: 15, socialImpact: 15, stress: -5 },
     probability: 0.1,
-    requiresStage: 'career',
+    requiresStage: LifeStage.EARLY_CAREER,
     requiresTraits: [PersonalityTrait.COOPERATIVE]
   }
 ];

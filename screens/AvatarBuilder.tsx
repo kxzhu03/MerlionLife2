@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types/navigation';
 import { 
   Gender, SkinTone, HairStyle, HairColor, ClothingStyle, ClothingColor, 
   Accessory, AvatarCustomization, generateAvatarEmoji 
 } from '../types/avatar';
 
-type NavProp = StackNavigationProp<RootStackParamList, 'AvatarBuilder'>;
-
 interface Props {
-  navigation: NavProp;
   onComplete: (customization: AvatarCustomization) => void;
 }
 
-const AvatarBuilder: React.FC<Props> = ({ navigation, onComplete }) => {
+const AvatarBuilder: React.FC<Props> = ({ onComplete }) => {
   const [gender, setGender] = useState<Gender>(Gender.MALE);
   const [skinTone, setSkinTone] = useState<SkinTone>(SkinTone.MEDIUM);
   const [hairStyle, setHairStyle] = useState<HairStyle>(HairStyle.SHORT);

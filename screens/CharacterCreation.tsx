@@ -62,7 +62,7 @@ const CharacterCreation: React.FC<Props> = ({ navigation }) => {
   };
 
   if (step === 'avatar') {
-    return <AvatarBuilder navigation={navigation} onComplete={handleAvatarComplete} />;
+    return <AvatarBuilder onComplete={handleAvatarComplete} />;
   }
 
   return (

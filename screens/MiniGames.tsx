@@ -6,8 +6,8 @@ import { RootStackParamList } from '../types/navigation';
 import { GameState, Player } from '../types';
 import { GameService } from '../services/GameService';
 
-type NavProp = StackNavigationProp<RootStackParamList, 'PSLEQuiz'>;
-type RouteProps = RouteProp<RootStackParamList, 'PSLEQuiz'>;
+type NavProp = StackNavigationProp<RootStackParamList, 'Game'>;
+type RouteProps = RouteProp<RootStackParamList, 'Game'>;
 
 interface Props {
   navigation: NavProp;

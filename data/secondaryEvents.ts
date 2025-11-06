@@ -479,7 +479,7 @@ export const SECONDARY_EVENTS: RandomEventData[] = [
     id: RandomEvent.ARTS_SCHOLARSHIP,
     name: 'Arts Excellence Scholarship',
     description: 'Your artistic talent impressed the judges! You received an arts scholarship to pursue your creative passion.',
-    statChanges: { happiness: 15, wealth: 1800, reputation: 12, creativity: 8 },
+    statChanges: { happiness: 15, wealth: 1800, reputation: 12, socialImpact: 8 },
     relationshipEffects: [{ type: RelationshipType.FAMILY, change: 18 }],
     probability: 0.05,
     requiresYear: [3, 4],

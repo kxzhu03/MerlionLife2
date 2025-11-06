@@ -12,7 +12,6 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import { AvatarCustomization } from '../types/avatar';
 import { Colors, BorderRadius, Spacing, Typography } from '../theme/colors';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'AvatarBuilder'>;
@@ -22,6 +21,17 @@ interface Props {
   navigation: NavProp;
   route: RouteProps;
 }
+
+// Local loose type to decouple from strict enum-based AvatarCustomization
+type LooseAvatarCustomization = {
+  gender: string;
+  skinTone: string;
+  hairStyle: string;
+  hairColor: string;
+  clothingStyle: string;
+  clothingColor: string;
+  accessories: string;
+};
 
 const AVATAR_OPTIONS = {
   gender: [
@@ -55,7 +65,7 @@ const AVATAR_OPTIONS = {
     { id: 'green', label: 'Green', color: '#228B22' },
     { id: 'pink', label: 'Pink', color: '#FF69B4' }
   ],
-  clothing: [
+  clothingStyle: [
     { id: 'casual', label: 'Casual', emoji: '👕' },
     { id: 'formal', label: 'Formal', emoji: '🎩' },
     { id: 'sporty', label: 'Sporty', emoji: '⚽' },
@@ -87,22 +97,20 @@ const AVATAR_OPTIONS = {
   ]
 };
 
-const EnhancedAvatarBuilder: React.FC<Props> = ({ navigation, route }) => {
-  const [customization, setCustomization] = useState<AvatarCustomization>(
-    route.params?.customization || {
-      gender: 'male',
-      skinTone: 'medium',
-      hairStyle: 'short',
-      hairColor: 'black',
-      clothingStyle: 'casual',
-      clothingColor: 'blue',
-      accessories: 'none'
-    }
-  );
+const EnhancedAvatarBuilder: React.FC<Props> = ({ navigation }) => {
+  const [customization, setCustomization] = useState<LooseAvatarCustomization>({
+    gender: 'male',
+    skinTone: 'medium',
+    hairStyle: 'short',
+    hairColor: 'black',
+    clothingStyle: 'casual',
+    clothingColor: 'blue',
+    accessories: 'none'
+  });
 
   const [activeCategory, setActiveCategory] = useState<keyof typeof AVATAR_OPTIONS>('gender');
 
-  const updateCustomization = (category: keyof AvatarCustomization, value: string) => {
+  const updateCustomization = (category: keyof LooseAvatarCustomization, value: string) => {
     setCustomization({
       ...customization,
       [category]: value
@@ -112,7 +120,7 @@ const EnhancedAvatarBuilder: React.FC<Props> = ({ navigation, route }) => {
   const getAvatarPreview = () => {
     const genderEmoji = AVATAR_OPTIONS.gender.find(g => g.id === customization.gender)?.emoji || '👨';
     const hairEmoji = AVATAR_OPTIONS.hairStyle.find(h => h.id === customization.hairStyle)?.emoji || '💇';
-    const clothingEmoji = AVATAR_OPTIONS.clothing.find(c => c.id === customization.clothingStyle)?.emoji || '👕';
+  const clothingEmoji = AVATAR_OPTIONS.clothingStyle.find(c => c.id === customization.clothingStyle)?.emoji || '👕';
     const accessoryEmoji = AVATAR_OPTIONS.accessories.find(a => a.id === customization.accessories)?.emoji || '✨';
 
     return `${genderEmoji}${hairEmoji}${clothingEmoji}${accessoryEmoji}`;
@@ -131,7 +139,7 @@ const EnhancedAvatarBuilder: React.FC<Props> = ({ navigation, route }) => {
   };
 
   const handleContinue = () => {
-    navigation.navigate('CharacterCreation', { customization });
+    navigation.navigate('CharacterCreation');
   };
 
   const renderCategoryOptions = () => {
@@ -259,7 +267,7 @@ const EnhancedAvatarBuilder: React.FC<Props> = ({ navigation, route }) => {
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>Outfit</Text>
             <Text style={styles.statValue}>
-              {AVATAR_OPTIONS.clothing.find(c => c.id === customization.clothingStyle)?.label}
+              {AVATAR_OPTIONS.clothingStyle.find(c => c.id === customization.clothingStyle)?.label}
             </Text>
           </View>
           <View style={styles.statItem}>
@@ -302,12 +310,12 @@ const EnhancedAvatarBuilder: React.FC<Props> = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.randomButton}
           onPress={() => {
-            const randomCustomization: AvatarCustomization = {
+            const randomCustomization: LooseAvatarCustomization = {
               gender: AVATAR_OPTIONS.gender[Math.floor(Math.random() * AVATAR_OPTIONS.gender.length)].id as any,
               skinTone: AVATAR_OPTIONS.skinTone[Math.floor(Math.random() * AVATAR_OPTIONS.skinTone.length)].id as any,
               hairStyle: AVATAR_OPTIONS.hairStyle[Math.floor(Math.random() * AVATAR_OPTIONS.hairStyle.length)].id as any,
               hairColor: AVATAR_OPTIONS.hairColor[Math.floor(Math.random() * AVATAR_OPTIONS.hairColor.length)].id as any,
-              clothingStyle: AVATAR_OPTIONS.clothing[Math.floor(Math.random() * AVATAR_OPTIONS.clothing.length)].id as any,
+              clothingStyle: AVATAR_OPTIONS.clothingStyle[Math.floor(Math.random() * AVATAR_OPTIONS.clothingStyle.length)].id as any,
               clothingColor: AVATAR_OPTIONS.clothingColor[Math.floor(Math.random() * AVATAR_OPTIONS.clothingColor.length)].id as any,
               accessories: AVATAR_OPTIONS.accessories[Math.floor(Math.random() * AVATAR_OPTIONS.accessories.length)].id as any
             };
