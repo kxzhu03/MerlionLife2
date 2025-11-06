@@ -196,11 +196,7 @@ This enhanced version builds upon the original MerlionLife2 with:
 - Improved game mechanics
 - Better player feedback
 
-## 📝 Credits
 
-Enhanced by Manus AI based on the original MerlionLife2 concept.
-
----
 
 **Version**: 2.0 Enhanced Edition  
 **Platform**: React Native (Expo)  
