@@ -6,6 +6,8 @@ import { RootStackParamList } from '../types/navigation';
 import { GameState, Player, MealChoice } from '../types';
 import { SecondarySchoolService } from '../services/SecondarySchoolService';
 import { GameService } from '../services/GameService';
+import { PortfolioService } from '../services/PortfolioService';
+import { InvestmentService } from '../services/InvestmentService';
 import { SECONDARY_EVENTS } from '../data/secondaryEvents';
 import { CCA_OPTIONS } from '../data/constants';
 import { getRandomChoiceEvent } from '../data/choiceEvents';
@@ -99,6 +101,16 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
     // Update CCA skill with retention if CCA changed
     updatedPlayer = GameService.updateCCASkill(updatedPlayer, ccaFocus, previousCCA);
 
+    // Apply yearly financial changes
+    updatedPlayer = PortfolioService.applyAnnualPortfolioUpdates(updatedPlayer);
+
+    if (updatedPlayer.investments && updatedPlayer.investments.length > 0) {
+      updatedPlayer = {
+        ...updatedPlayer,
+        investments: updatedPlayer.investments.map(investment => InvestmentService.calculateYearlyReturns(investment))
+      };
+    }
+
     // Trigger random event
     const stageYear = player.lifeStageProgress?.stageYear || 1;
     const availableEvents = SECONDARY_EVENTS.filter(event => {
@@ -119,7 +131,7 @@ const SecondaryYearPlanning: React.FC<Props> = ({ navigation, route }) => {
     }
 
     // Check achievements
-    updatedPlayer = GameService.checkAchievements(updatedPlayer);
+  updatedPlayer = GameService.checkAchievements(updatedPlayer);
 
     // Advance year
     updatedPlayer = SecondarySchoolService.advanceYear(updatedPlayer);

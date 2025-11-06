@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -37,7 +37,7 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
   const [selectedLiability, setSelectedLiability] = useState<LiabilityMarketData | null>(null);
   const [buyQuantity, setBuyQuantity] = useState('1');
 
-  const portfolio = player.portfolio || PortfolioService.initializePortfolio();
+  const portfolio = useMemo(() => PortfolioService.snapshotPortfolio(player), [player]);
   const legacyInvestments: Investment[] = player.investments || [];
   const availableAssets = PortfolioService.getAvailableAssets(player);
   const availableLiabilities = PortfolioService.getAvailableLiabilities(player);

@@ -20,6 +20,24 @@ export class PortfolioService {
   }
 
   /**
+   * Return a recalculated portfolio snapshot without mutating the stored data
+   */
+  static snapshotPortfolio(player: Player): Portfolio {
+    const existing = player.portfolio;
+    if (!existing) {
+      return this.initializePortfolio();
+    }
+
+    const clone: Portfolio = {
+      ...existing,
+      assets: existing.assets.map(asset => ({ ...asset })),
+      liabilities: existing.liabilities.map(liability => ({ ...liability }))
+    };
+
+    return this.recalculatePortfolio(clone);
+  }
+
+  /**
    * Buy an asset
    */
   static buyAsset(
@@ -239,6 +257,31 @@ export class PortfolioService {
       },
       portfolio: updatedPortfolio
     };
+  }
+
+  /**
+   * Apply multiple months of loan payments (helper for yearly processing)
+   */
+  static processMonthlyPaymentsMultiple(player: Player, months: number): Player {
+    let updatedPlayer = player;
+    for (let i = 0; i < months; i += 1) {
+      const hasLiabilities = updatedPlayer.portfolio?.liabilities?.length;
+      if (!hasLiabilities) {
+        break;
+      }
+      updatedPlayer = this.processMonthlyPayments(updatedPlayer);
+    }
+    return updatedPlayer;
+  }
+
+  /**
+   * Convenience helper to run all yearly portfolio side-effects (payments + returns)
+   */
+  static applyAnnualPortfolioUpdates(player: Player): Player {
+    let updatedPlayer = player;
+    updatedPlayer = this.processMonthlyPaymentsMultiple(updatedPlayer, 12);
+    updatedPlayer = this.applyAnnualReturns(updatedPlayer);
+    return updatedPlayer;
   }
 
   /**

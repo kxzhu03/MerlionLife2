@@ -6,6 +6,8 @@ import { RootStackParamList } from '../types/navigation';
 import { ACTIVITY_POINTS_PER_YEAR, HEALTHY_MEAL_COST, UNHEALTHY_MEAL_COST, SES_CONFIG, CCA_OPTIONS } from '../data/constants';
 import { ActivityPoints, GameState, MealChoice, Player } from '../types';
 import { GameService } from '../services/GameService';
+import { PortfolioService } from '../services/PortfolioService';
+import { InvestmentService } from '../services/InvestmentService';
 import { getRandomChoiceEvent } from '../data/choiceEvents';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'YearlyPlanning'>;
@@ -90,7 +92,17 @@ const YearlyPlanning: React.FC<Props> = ({ navigation, route }) => {
     // Update CCA skill with retention if changed
     finalPlayer = GameService.updateCCASkill(finalPlayer, ccaPoints, previousCCA);
 
-    // Check achievements
+    // Apply yearly portfolio changes (loan payments, market returns)
+    finalPlayer = PortfolioService.applyAnnualPortfolioUpdates(finalPlayer);
+
+    if (finalPlayer.investments && finalPlayer.investments.length > 0) {
+      finalPlayer = {
+        ...finalPlayer,
+        investments: finalPlayer.investments.map(investment => InvestmentService.calculateYearlyReturns(investment))
+      };
+    }
+
+    // Check achievements after financial updates
     finalPlayer = GameService.checkAchievements(finalPlayer);
 
     // Advance year
