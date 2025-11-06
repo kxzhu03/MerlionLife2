@@ -21,6 +21,18 @@ export class InvestmentService {
         expectedReturn: 6,
         description: 'Invest in established Singapore companies (DBS, OCBC, UOB)'
       });
+
+      investments.push({
+        id: 'sp500_index',
+        name: 'S&P 500 ETF',
+        type: 'stock',
+        initialInvestment: 1500,
+        currentValue: 1500,
+        yearsHeld: 0,
+        riskLevel: 'medium',
+        expectedReturn: 8,
+        description: 'Broad-market US equity tracker delivering long-term 7-9% returns.'
+      });
     }
 
     if (wealth >= 5000) {
@@ -47,6 +59,30 @@ export class InvestmentService {
         expectedReturn: 2.5,
         description: 'Safe investment with guaranteed returns'
       });
+
+      investments.push({
+        id: 'green_energy_fund',
+        name: 'Green Energy ETF',
+        type: 'stock',
+        initialInvestment: 6000,
+        currentValue: 6000,
+        yearsHeld: 0,
+        riskLevel: 'medium',
+        expectedReturn: 10,
+        description: 'Basket of renewable energy companies with secular growth tailwinds.'
+      });
+
+      investments.push({
+        id: 'anus_token_speculation',
+        name: 'AnusToken Speculation',
+        type: 'crypto',
+        initialInvestment: 2000,
+        currentValue: 2000,
+        yearsHeld: 0,
+        riskLevel: 'high',
+        expectedReturn: 120,
+        description: 'High-octane meme token with explosive pumps and brutal dumps. Only for gamblers.'
+      });
     }
 
     if (wealth >= 10000) {
@@ -61,6 +97,18 @@ export class InvestmentService {
         expectedReturn: 12,
         description: 'High-growth tech and biotech companies'
       });
+
+      investments.push({
+        id: 'temasek_bond_ladder',
+        name: 'Temasek Bond Ladder',
+        type: 'bond',
+        initialInvestment: 10000,
+        currentValue: 10000,
+        yearsHeld: 0,
+        riskLevel: 'low',
+        expectedReturn: 4,
+        description: 'Blend of AAA-rated Temasek issues maturing over five years.'
+      });
     }
 
     if (wealth >= 50000) {
@@ -74,6 +122,18 @@ export class InvestmentService {
         riskLevel: 'high',
         expectedReturn: 25,
         description: 'Bitcoin, Ethereum, and other cryptocurrencies (Volatile!)'
+      });
+
+      investments.push({
+        id: 'private_equity_seed',
+        name: 'Private Equity Seed Fund',
+        type: 'business',
+        initialInvestment: 50000,
+        currentValue: 50000,
+        yearsHeld: 0,
+        riskLevel: 'high',
+        expectedReturn: 18,
+        description: 'Exposure to early-stage Southeast Asian startups with long lock-in.'
       });
     }
 
@@ -115,13 +175,17 @@ export class InvestmentService {
    * Calculate investment returns after a year
    */
   static calculateYearlyReturns(investment: Investment): Investment {
-    const volatility = investment.riskLevel === 'low' ? 0.02 : investment.riskLevel === 'medium' ? 0.05 : 0.15;
-    const randomFactor = (Math.random() - 0.5) * 2 * volatility; // -volatility to +volatility
-    const actualReturn = (investment.expectedReturn / 100 + randomFactor);
+    const baseVolatility = investment.riskLevel === 'low' ? 0.03 : investment.riskLevel === 'medium' ? 0.08 : 0.25;
+    const typeVariance = investment.type === 'bond' ? 0.4 : investment.type === 'property' ? 0.6 : investment.type === 'crypto' ? 2.2 : investment.type === 'business' ? 1.6 : 1;
+    const volatility = baseVolatility * typeVariance;
+    const drift = investment.expectedReturn / 100;
+    const randomShock = (Math.random() - 0.5) * 2 * volatility;
+    const actualReturn = drift + randomShock;
+    const nextValue = Math.max(0, investment.currentValue * (1 + actualReturn));
 
     return {
       ...investment,
-      currentValue: investment.currentValue * (1 + actualReturn),
+      currentValue: nextValue,
       yearsHeld: investment.yearsHeld + 1
     };
   }

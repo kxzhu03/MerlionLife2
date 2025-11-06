@@ -56,6 +56,7 @@ export class PortfolioService {
       purchaseDate: new Date(),
       annualReturn: marketData.annualReturn,
       riskLevel: marketData.riskLevel,
+      marketId: marketData.id,
       description: marketData.description
     };
 
@@ -198,18 +199,21 @@ export class PortfolioService {
 
     portfolio.assets = portfolio.assets.map(asset => {
       // Calculate return with some randomness based on volatility
-      const marketData = ASSET_MARKET_DATA.find(m => m.type === asset.type);
-      const volatility = marketData?.volatility || 0.05;
+      const marketData = ASSET_MARKET_DATA.find(m => m.id === asset.marketId)
+        || ASSET_MARKET_DATA.find(m => m.name === asset.name)
+        || ASSET_MARKET_DATA.find(m => m.type === asset.type);
+      const volatility = marketData?.volatility ?? 0.05;
+      const baselineReturn = marketData?.annualReturn ?? asset.annualReturn;
       const randomFactor = 1 + (Math.random() - 0.5) * volatility * 2;
-      
-      const returnRate = (asset.annualReturn / 100) * randomFactor;
+      const returnRate = (baselineReturn / 100) * randomFactor;
       const returnAmount = asset.currentValue * returnRate;
       
       totalReturns += returnAmount;
 
       return {
         ...asset,
-        currentValue: asset.currentValue * (1 + returnRate)
+        currentValue: asset.currentValue * (1 + returnRate),
+        annualReturn: baselineReturn
       };
     });
 

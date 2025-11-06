@@ -23,6 +23,7 @@ export interface Asset {
   purchaseDate: Date;
   annualReturn: number; // percentage
   riskLevel: 'low' | 'medium' | 'high';
+  marketId?: string;
   description: string;
 }
 

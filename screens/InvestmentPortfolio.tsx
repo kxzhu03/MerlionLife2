@@ -14,8 +14,10 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { GameState } from '../types';
 import { PortfolioService } from '../services/PortfolioService';
+import { InvestmentService } from '../services/InvestmentService';
 import { ASSET_MARKET_DATA, LIABILITY_MARKET_DATA } from '../data/marketData';
 import { AssetMarketData, LiabilityMarketData, Asset, Liability } from '../types/assets';
+import { Investment } from '../types/investments';
 import { GameService } from '../services/GameService';
 
 type NavProp = StackNavigationProp<RootStackParamList, 'InvestmentPortfolio'>;
@@ -36,8 +38,13 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
   const [buyQuantity, setBuyQuantity] = useState('1');
 
   const portfolio = player.portfolio || PortfolioService.initializePortfolio();
+  const legacyInvestments: Investment[] = player.investments || [];
   const availableAssets = PortfolioService.getAvailableAssets(player);
   const availableLiabilities = PortfolioService.getAvailableLiabilities(player);
+  const legacyInvestmentValue = legacyInvestments.reduce((sum, inv) => sum + inv.currentValue, 0);
+  const combinedAssetValue = portfolio.totalAssetValue + legacyInvestmentValue;
+  const combinedNetWorth = combinedAssetValue - portfolio.totalLiabilityValue;
+  const legacyGain = legacyInvestments.reduce((sum, inv) => sum + (inv.currentValue - inv.initialInvestment), 0);
 
   const handleBuyAsset = async () => {
     if (!selectedAsset) return;
@@ -105,15 +112,52 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
     );
   };
 
+  const handleSellLegacyInvestment = async (investmentId: string) => {
+    Alert.alert(
+      'Sell Investment',
+      'Realise gains (or losses) from this investment?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sell',
+          style: 'destructive',
+          onPress: async () => {
+            const result = InvestmentService.sellInvestment(player, investmentId);
+            if (result.success) {
+              const newGameState = { ...gameState, player: result.newPlayer };
+              await GameService.saveGameState(newGameState);
+              setGameState(newGameState);
+              Alert.alert('Sold!', result.message);
+            } else {
+              Alert.alert('Sale Failed', result.message);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderPortfolioTab = () => (
     <ScrollView style={styles.tabContent}>
       {/* Summary Card */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>Portfolio Summary</Text>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Total Assets:</Text>
+          <Text style={styles.summaryLabel}>Portfolio Assets:</Text>
           <Text style={[styles.summaryValue, styles.positive]}>
             ${portfolio.totalAssetValue.toLocaleString()}
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Legacy Investments:</Text>
+          <Text style={[styles.summaryValue, legacyInvestmentValue >= 0 ? styles.positive : styles.negative]}>
+            ${legacyInvestmentValue.toLocaleString()}
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Total Asset Base:</Text>
+          <Text style={[styles.summaryValue, styles.positive]}>
+            ${combinedAssetValue.toLocaleString()}
           </Text>
         </View>
         <View style={styles.summaryRow}>
@@ -124,8 +168,8 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
         </View>
         <View style={[styles.summaryRow, styles.summaryDivider]}>
           <Text style={styles.summaryLabelBold}>Net Worth:</Text>
-          <Text style={[styles.summaryValueBold, portfolio.netWorth >= 0 ? styles.positive : styles.negative]}>
-            ${portfolio.netWorth.toLocaleString()}
+          <Text style={[styles.summaryValueBold, combinedNetWorth >= 0 ? styles.positive : styles.negative]}>
+            ${combinedNetWorth.toLocaleString()}
           </Text>
         </View>
         <View style={styles.summaryRow}>
@@ -140,6 +184,12 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
             ${portfolio.monthlyExpenses.toLocaleString()}
           </Text>
         </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Legacy P&amp;L:</Text>
+          <Text style={[styles.summaryValue, legacyGain >= 0 ? styles.positive : styles.negative]}>
+            ${legacyGain.toLocaleString()}
+          </Text>
+        </View>
       </View>
 
       {/* Assets */}
@@ -151,43 +201,113 @@ const InvestmentPortfolio: React.FC<Props> = ({ navigation, route }) => {
           <Text style={styles.emptySubtext}>Start investing to build wealth!</Text>
         </View>
       ) : (
-        portfolio.assets.map((asset) => (
-          <View key={asset.id} style={styles.itemCard}>
-            <View style={styles.itemHeader}>
-              <Text style={styles.itemEmoji}>{ASSET_MARKET_DATA.find(a => a.type === asset.type)?.emoji || '📈'}</Text>
-              <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{asset.name}</Text>
-                <Text style={styles.itemType}>{asset.type.toUpperCase()} • {asset.quantity} units</Text>
+        portfolio.assets.map((asset) => {
+          const marketInfo = ASSET_MARKET_DATA.find(a => a.id === asset.marketId)
+            || ASSET_MARKET_DATA.find(a => a.name === asset.name)
+            || ASSET_MARKET_DATA.find(a => a.type === asset.type);
+          const purchaseTotal = asset.purchasePrice * asset.quantity;
+          const gain = asset.currentValue - purchaseTotal;
+          return (
+            <View key={asset.id} style={styles.itemCard}>
+              <View style={styles.itemHeader}>
+                <Text style={styles.itemEmoji}>{marketInfo?.emoji || '📈'}</Text>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{asset.name}</Text>
+                  <Text style={styles.itemType}>
+                    {(marketInfo?.symbol || asset.type.toUpperCase())} • {asset.quantity} units
+                  </Text>
+                </View>
               </View>
+              <View style={styles.itemStats}>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Purchase Price:</Text>
+                  <Text style={styles.statValue}>${asset.purchasePrice.toLocaleString()}</Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Current Value:</Text>
+                  <Text style={[styles.statValue, asset.currentValue >= purchaseTotal ? styles.positive : styles.negative]}>
+                    ${asset.currentValue.toLocaleString()}
+                  </Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Gain/Loss:</Text>
+                  <Text style={[styles.statValue, gain >= 0 ? styles.positive : styles.negative]}>
+                    ${gain.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Annual Return:</Text>
+                  <Text style={styles.statValue}>{asset.annualReturn}%</Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.sellButton}
+                onPress={() => handleSellAsset(asset.id)}
+              >
+                <Text style={styles.sellButtonText}>Sell</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.itemStats}>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Purchase Price:</Text>
-                <Text style={styles.statValue}>${asset.purchasePrice.toLocaleString()}</Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Current Value:</Text>
-                <Text style={[styles.statValue, styles.positive]}>${asset.currentValue.toLocaleString()}</Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Gain/Loss:</Text>
-                <Text style={[styles.statValue, asset.currentValue >= asset.purchasePrice * asset.quantity ? styles.positive : styles.negative]}>
-                  ${(asset.currentValue - asset.purchasePrice * asset.quantity).toLocaleString()}
+          );
+        })
+      )}
+
+      {/* Legacy Investments */}
+      <Text style={styles.sectionTitle}>Legacy Investments ({legacyInvestments.length})</Text>
+      {legacyInvestments.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyEmoji}>📈</Text>
+          <Text style={styles.emptyText}>No legacy investments</Text>
+          <Text style={styles.emptySubtext}>Use the Invest tab to start building positions.</Text>
+        </View>
+      ) : (
+        legacyInvestments.map((investment) => {
+          const performance = InvestmentService.getInvestmentPerformance(investment);
+          return (
+            <View key={investment.id} style={styles.itemCard}>
+              <View style={styles.itemHeader}>
+                <Text style={styles.itemEmoji}>
+                  {investment.type === 'crypto' ? '🪙' : investment.type === 'bond' ? '📜' : investment.type === 'property' ? '🏠' : investment.type === 'business' ? '🏢' : '📈'}
                 </Text>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{investment.name}</Text>
+                  <Text style={styles.itemType}>{investment.type.toUpperCase()} • {investment.riskLevel.toUpperCase()} RISK</Text>
+                </View>
               </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Annual Return:</Text>
-                <Text style={styles.statValue}>{asset.annualReturn}%</Text>
+              <View style={styles.itemStats}>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Initial Amount:</Text>
+                  <Text style={styles.statValue}>${investment.initialInvestment.toLocaleString()}</Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Current Value:</Text>
+                  <Text style={[styles.statValue, performance.status === 'loss' ? styles.negative : styles.positive]}>
+                    ${investment.currentValue.toLocaleString()}
+                  </Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Gain/Loss:</Text>
+                  <Text style={[styles.statValue, performance.status === 'loss' ? styles.negative : performance.status === 'profit' ? styles.positive : styles.neutral]}>
+                    ${performance.gain.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ({performance.gainPercentage.toFixed(1)}%)
+                  </Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Years Held:</Text>
+                  <Text style={styles.statValue}>{investment.yearsHeld}</Text>
+                </View>
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Expected Return:</Text>
+                  <Text style={styles.statValue}>{investment.expectedReturn}% p.a.</Text>
+                </View>
               </View>
+              <TouchableOpacity
+                style={styles.sellButton}
+                onPress={() => handleSellLegacyInvestment(investment.id)}
+              >
+                <Text style={styles.sellButtonText}>Sell</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.sellButton}
-              onPress={() => handleSellAsset(asset.id)}
-            >
-              <Text style={styles.sellButtonText}>Sell</Text>
-            </TouchableOpacity>
-          </View>
-        ))
+          );
+        })
       )}
 
       {/* Liabilities */}

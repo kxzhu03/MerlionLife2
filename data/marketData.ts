@@ -86,6 +86,48 @@ export const ASSET_MARKET_DATA: AssetMarketData[] = [
     description: 'Ride-hailing and delivery platform. Volatile but growing rapidly.',
     emoji: '🚗'
   },
+  {
+    id: 'sp500_etf',
+    name: 'S&P 500 ETF',
+    symbol: 'SPY',
+    type: 'stock',
+    currentPrice: 420.40,
+    previousPrice: 415.10,
+    riskLevel: 'medium',
+    volatility: 0.05,
+    annualReturn: 8.5,
+    minInvestment: 2000,
+    description: 'Broad exposure to 500 large US companies. Tracks the S&P 500 index.',
+    emoji: '🌎'
+  },
+  {
+    id: 'green_energy_etf',
+    name: 'Global Green Energy ETF',
+    symbol: 'ICLN',
+    type: 'stock',
+    currentPrice: 55.30,
+    previousPrice: 53.90,
+    riskLevel: 'medium',
+    volatility: 0.07,
+    annualReturn: 10.2,
+    minInvestment: 3000,
+    description: 'Diversified fund of renewable energy companies worldwide.',
+    emoji: '🌱'
+  },
+  {
+    id: 'asean_growth_fund',
+    name: 'ASEAN Growth Fund',
+    symbol: 'ASEAN',
+    type: 'stock',
+    currentPrice: 28.10,
+    previousPrice: 27.20,
+    riskLevel: 'high',
+    volatility: 0.09,
+    annualReturn: 13.5,
+    minInvestment: 4000,
+    description: 'Basket of fast-growing Southeast Asian equities. Higher volatility for higher upside.',
+    emoji: '🌏'
+  },
 
   // === BONDS ===
   {
@@ -130,6 +172,34 @@ export const ASSET_MARKET_DATA: AssetMarketData[] = [
     description: 'Short-term government securities. Very safe with decent returns.',
     emoji: '💵'
   },
+  {
+    id: 'temasek_bond',
+    name: 'Temasek Corporate Bond',
+    symbol: 'TMSK',
+    type: 'bond',
+    currentPrice: 102.30,
+    previousPrice: 101.90,
+    riskLevel: 'low',
+    volatility: 0.01,
+    annualReturn: 3.8,
+    minInvestment: 5000,
+    description: 'AAA-rated Temasek bond. Attractive yield for low risk profile.',
+    emoji: '🏦'
+  },
+  {
+    id: 'emerging_market_bond',
+    name: 'Emerging Market Bond Fund',
+    symbol: 'EMB',
+    type: 'bond',
+    currentPrice: 89.50,
+    previousPrice: 90.20,
+    riskLevel: 'medium',
+    volatility: 0.04,
+    annualReturn: 6.4,
+    minInvestment: 3000,
+    description: 'Higher yielding sovereign bonds from emerging economies. Moderate risk.',
+    emoji: '🌍'
+  },
 
   // === CRYPTOCURRENCY ===
   {
@@ -159,6 +229,20 @@ export const ASSET_MARKET_DATA: AssetMarketData[] = [
     minInvestment: 5000,
     description: 'Smart contract platform. High volatility but strong ecosystem.',
     emoji: '⟠'
+  },
+  {
+    id: 'anus_token',
+    name: 'AnusToken',
+    symbol: 'ANUS',
+    type: 'crypto',
+    currentPrice: 0.08,
+    previousPrice: 0.05,
+    riskLevel: 'high',
+    volatility: 0.40,
+    annualReturn: 180,
+    minInvestment: 500,
+    description: 'Ultra-volatile meme coin riding social media hype cycles. Treat as a speculative bet.',
+    emoji: '🚀'
   },
 
   // === REITs ===
